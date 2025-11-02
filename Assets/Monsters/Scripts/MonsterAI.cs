@@ -197,12 +197,8 @@ public class MonsterAI : MonoBehaviour
     void PerformAttack()
     {
         Debug.Log($"Монстр атаковал игрока!");
-        /*PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
-        if (playerHealth != null)
-        {
-            playerHealth.TakeDamage(attackDamage);
-            Debug.Log($"Монстр атаковал игрока! Урон: {attackDamage}");
-        }*/
+        PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
+        playerHealth.TakeDamage();
     }
 
     void OnDrawGizmosSelected()
