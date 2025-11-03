@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour
     public float slowedSpeed = 2f;
     public float smoothTime = 0.1f;
     public bool canMove = true;
+    public bool isCrouching;
+    private bool isSlowed = false;
 
     private Vector2 smoothVelocity;
     private Rigidbody2D rb;
@@ -27,11 +29,22 @@ public class PlayerController : MonoBehaviour
                                                    ref smoothVelocity, smoothTime);
             return;
         }
-        
-        float currentSpeed = crouchAction.IsPressed() ? slowedSpeed : normalSpeed;
+
+        isCrouching = crouchAction.IsPressed() || isSlowed;
+        float currentSpeed = isCrouching ? slowedSpeed : normalSpeed;
 
         Vector2 move = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
-        rb.linearVelocity = Vector2.SmoothDamp(rb.linearVelocity, move * currentSpeed, 
+        rb.linearVelocity = Vector2.SmoothDamp(rb.linearVelocity, move * currentSpeed,
                                                 ref smoothVelocity, smoothTime);
+    }
+    
+    public void ApplySlow()
+    {
+        isSlowed = true;
+    }
+    
+    public void RemoveSlow()
+    {
+        isSlowed = false;
     }
 }

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-public class MonsterAI : MonoBehaviour
+public class FearAI : MonoBehaviour
 {
     [Header("AI Settings")]
     public float detectionRange = 8f;
@@ -10,7 +10,14 @@ public class MonsterAI : MonoBehaviour
     public float sightWaitTime = 3f;
     public float wanderSpeed = 1.5f;
     public float chaseSpeed = 3.5f;
-    public BoxCollider2D wanderArea;
+    public Transform[] wanderPoints;
+    public float hidingTime = 18f;
+    public float dashDistance = 3f;
+    public float dashDuration = 0.5f;
+
+    [Header("Visual Settings")]
+    public float darkenIntensity = 0.5f;
+    public float transparency = 0.7f;
 
     [Header("Attack Settings")]
     public float attackCooldown = 1.5f;
@@ -20,10 +27,16 @@ public class MonsterAI : MonoBehaviour
     [SerializeField] private float attackTimer;
     [SerializeField] private Vector3 lastKnownPlayerPosition;
     [SerializeField] private AIState currentState = AIState.Wandering;
+    [SerializeField] private float dashTimer;
+    [SerializeField] private Vector3 dashTarget;
 
     private NavMeshAgent agent;
     private Transform player;
-    private enum AIState { Wandering, Chasing, Attacking, Searching }
+    private SpriteRenderer spriteRenderer;
+    private Color originalColor;
+    private Rigidbody2D rb;
+    private int currentWanderPointIndex = -1;
+    private enum AIState { Wandering, Waiting, Chasing, Attacking, Searching, Dashing }
 
 
     void Start()
@@ -33,7 +46,15 @@ public class MonsterAI : MonoBehaviour
         agent.updateUpAxis = false;
         agent.speed = wanderSpeed;
         player = GameObject.FindGameObjectWithTag("Player").transform;
+        rb = GetComponent<Rigidbody2D>();
         
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        
+        if (spriteRenderer != null)
+        {
+            originalColor = spriteRenderer.color;
+        }
+
         SetWanderDestination();
     }
 
@@ -46,6 +67,9 @@ public class MonsterAI : MonoBehaviour
             case AIState.Wandering:
                 UpdateWandering();
                 break;
+            case AIState.Waiting:
+                UpdateWaiting();
+                break;
             case AIState.Chasing:
                 UpdateChasing();
                 break;
@@ -55,6 +79,9 @@ public class MonsterAI : MonoBehaviour
             case AIState.Searching:
                 UpdateSearching();
                 break;
+            case AIState.Dashing:
+                UpdateDashing();
+                break;
         }
     }
 
@@ -62,6 +89,7 @@ public class MonsterAI : MonoBehaviour
     {
         stateTimer -= Time.deltaTime;
         attackTimer -= Time.deltaTime;
+        dashTimer -= Time.deltaTime;
     }
 
     void UpdateWandering()
@@ -71,8 +99,22 @@ public class MonsterAI : MonoBehaviour
             StartChasing();
             return;
         }
-        
+
         if (agent.remainingDistance <= agent.stoppingDistance && stateTimer <= 0)
+        {
+            StartWaiting();
+        }
+    }
+    
+    void UpdateWaiting()
+    {
+        if (CanSeePlayer())
+        {
+            StartDashing();
+            return;
+        }
+        
+        if (stateTimer <= 0)
         {
             SetWanderDestination();
         }
@@ -126,6 +168,23 @@ public class MonsterAI : MonoBehaviour
         StartWandering();
     }
 
+    void UpdateDashing()
+    {
+        if (dashTimer <= 0)
+        {
+            StartChasing();
+            return;
+        }
+        
+        float dashProgress = 1f - (dashTimer / dashDuration);
+        transform.position = Vector3.Lerp(transform.position, dashTarget, dashProgress);
+        
+        if (Vector3.Distance(transform.position, player.position) <= attackRange)
+        {
+            StartAttacking();
+        }
+    }
+
     bool CanSeePlayer()
     {
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
@@ -143,31 +202,46 @@ public class MonsterAI : MonoBehaviour
 
     void SetWanderDestination()
     {
-        Vector3 randomPoint;
-
-        if (wanderArea != null)
+        if (wanderPoints == null || wanderPoints.Length == 0)
         {
-            Bounds bounds = wanderArea.bounds;
-        
-            float randomX = Random.Range(bounds.min.x, bounds.max.x);
-            float randomY = Random.Range(bounds.min.y, bounds.max.y);
+            Debug.LogError("Нет точек ожидания!");
+            return;
+        }
 
-            randomPoint = new Vector3(randomX, randomY, 0);
-            
-            NavMeshHit hit;
-            if (NavMesh.SamplePosition(randomPoint, out hit, 10f, NavMesh.AllAreas))
-            {
-                agent.SetDestination(hit.position);
-                stateTimer = waitTimeAtPoint;
-            }
-        }    
+        int newIndex;
+        do
+        {
+            newIndex = Random.Range(0, wanderPoints.Length);
+        } while (newIndex == currentWanderPointIndex && wanderPoints.Length > 1);
+        
+        currentWanderPointIndex = newIndex;
+        
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(wanderPoints[currentWanderPointIndex].position, out hit, 10f, NavMesh.AllAreas))
+        {
+            agent.SetDestination(hit.position);
+            stateTimer = waitTimeAtPoint;
+            currentState = AIState.Wandering;
+            agent.speed = wanderSpeed;
+            agent.isStopped = false;
+            ResetAppearance();
+        }
     }
 
+    void StartWaiting()
+    {
+        currentState = AIState.Waiting;
+        agent.isStopped = true;
+        stateTimer = hidingTime;
+        DarkenAppearance();
+    }
+    
     void StartWandering()
     {
         currentState = AIState.Wandering;
         agent.speed = wanderSpeed;
         agent.isStopped = false;
+        ResetAppearance();
         SetWanderDestination();
     }
 
@@ -177,6 +251,7 @@ public class MonsterAI : MonoBehaviour
         agent.stoppingDistance = attackRange * 0.8f;
         agent.speed = chaseSpeed;
         agent.isStopped = false;
+        ResetAppearance();
     }
 
     void StartAttacking()
@@ -184,6 +259,7 @@ public class MonsterAI : MonoBehaviour
         currentState = AIState.Attacking;
         agent.isStopped = true;
         attackTimer = 0;
+        ResetAppearance();
     }
 
     void StartSearching()
@@ -192,6 +268,27 @@ public class MonsterAI : MonoBehaviour
         agent.SetDestination(lastKnownPlayerPosition);
         stateTimer = sightWaitTime;
         agent.isStopped = false;
+        ResetAppearance();
+    }
+
+        void StartDashing()
+    {
+        currentState = AIState.Dashing;
+        agent.isStopped = true;
+        
+        // Вычисляем направление и цель рывка
+        Vector3 directionToPlayer = (player.position - transform.position).normalized;
+        dashTarget = transform.position + directionToPlayer * dashDistance;
+        
+        // Убеждаемся, что точка рывка доступна на NavMesh
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(dashTarget, out hit, 2f, NavMesh.AllAreas))
+        {
+            dashTarget = hit.position;
+        }
+        
+        dashTimer = dashDuration;
+        ResetAppearance();
     }
 
     void PerformAttack()
@@ -199,18 +296,29 @@ public class MonsterAI : MonoBehaviour
         Debug.Log($"Монстр атаковал игрока!");
         PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
         playerHealth.TakeDamage();
+        Debug.Log($"Монстр атаковал игрока!");
+    }
+
+    void DarkenAppearance()
+    {
+        if (spriteRenderer != null)
+        {
+            Color darkenedColor = originalColor * darkenIntensity;
+            darkenedColor.a = transparency;
+            spriteRenderer.color = darkenedColor;
+        }
+    }
+
+    void ResetAppearance()
+    {
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.color = originalColor;
+        }
     }
 
     void OnDrawGizmosSelected()
     {
-        // Зона блуждания
-        if (wanderArea != null)
-        {
-            Gizmos.color = Color.blue;
-            Bounds bounds = wanderArea.bounds;
-            Gizmos.DrawWireCube(bounds.center, bounds.size);
-        }
-        
         // Радиус обнаружения
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
