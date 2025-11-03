@@ -21,6 +21,8 @@ public class ResentmentAI : MonoBehaviour
 
     private NavMeshAgent agent;
     private Transform player;
+    
+    private HideController hideController;
     private PuddleController homePuddle;
     private Vector3 puddlePosition;
     private enum AIState { Idle, Chasing, Attacking, Returning, Searching }
@@ -33,6 +35,7 @@ public class ResentmentAI : MonoBehaviour
         agent.updateUpAxis = false;
         agent.speed = chaseSpeed;
         player = GameObject.FindGameObjectWithTag("Player").transform;
+        hideController = GameObject.FindGameObjectWithTag("Player").GetComponent<HideController>();
     }
 
     void Update()
@@ -161,7 +164,7 @@ public class ResentmentAI : MonoBehaviour
     bool CanSeePlayer()
     {
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        if (distanceToPlayer > detectionRange) return false;
+        if (distanceToPlayer > detectionRange || hideController.isHiding) return false;
         
         RaycastHit2D hit = Physics2D.Raycast(
             transform.position, 

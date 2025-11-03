@@ -35,6 +35,7 @@ public class PlayerHealth : MonoBehaviour
     void Die()
     {
         playerController.canMove = false;
+        GetComponent<InventorySystem>().DropAllItems();
         OnPlayerDeath?.Invoke();
         Invoke(nameof(Respawn), respawnDelay);
     }

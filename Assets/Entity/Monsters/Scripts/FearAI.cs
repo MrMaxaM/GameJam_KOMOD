@@ -32,6 +32,7 @@ public class FearAI : MonoBehaviour
 
     private NavMeshAgent agent;
     private Transform player;
+    private HideController hideController;
     private SpriteRenderer spriteRenderer;
     private Color originalColor;
     private Rigidbody2D rb;
@@ -46,6 +47,7 @@ public class FearAI : MonoBehaviour
         agent.updateUpAxis = false;
         agent.speed = wanderSpeed;
         player = GameObject.FindGameObjectWithTag("Player").transform;
+        hideController = GameObject.FindGameObjectWithTag("Player").GetComponent<HideController>();
         rb = GetComponent<Rigidbody2D>();
         
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -188,7 +190,7 @@ public class FearAI : MonoBehaviour
     bool CanSeePlayer()
     {
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        if (distanceToPlayer > detectionRange) return false;
+        if (distanceToPlayer > detectionRange || hideController.isHiding) return false;
         
         RaycastHit2D hit = Physics2D.Raycast(
             transform.position, 
