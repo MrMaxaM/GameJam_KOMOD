@@ -10,6 +10,12 @@ public class DestructibleObject : MonoBehaviour
         {
             Instantiate(destroyedVersion, transform.position, transform.rotation);
         }
+
+        Closet closet = GetComponent<Closet>();
+        if (closet != null)
+        {
+            closet.ForceExit();
+        }
         
         Destroy(gameObject);
     }

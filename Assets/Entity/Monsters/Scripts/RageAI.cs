@@ -25,6 +25,8 @@ public class RageAI : MonoBehaviour
     
     private NavMeshAgent agent;
     private Transform player;
+    
+    private HideController hideController;
     private PlayerController playerController;
     private Vector3 lastHeardPosition;
     private float stateTimer;
@@ -41,6 +43,7 @@ public class RageAI : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         playerController = player.GetComponent<PlayerController>();
+        hideController = GameObject.FindGameObjectWithTag("Player").GetComponent<HideController>();
         currentHearingRange = normalHearingRange;
         agent.updateRotation = false;
         agent.updateUpAxis = false;
@@ -178,7 +181,7 @@ public class RageAI : MonoBehaviour
     bool CanHearPlayer()
     {
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        return distanceToPlayer <= currentHearingRange;
+        return distanceToPlayer <= currentHearingRange & !hideController.isHiding;
     }
 
     void StartPreparingCharge()
