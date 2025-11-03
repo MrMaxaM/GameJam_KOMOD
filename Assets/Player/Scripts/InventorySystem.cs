@@ -19,7 +19,7 @@ public class InventorySystem : MonoBehaviour
     [Header("Item Settings")]
     public LayerMask itemLayers = 1; // Слои для предметов
     
-    private List<Item> inventory = new List<Item>();
+    public List<Item> inventory = new List<Item>();
     private PlayerController playerController;
 
     void Start()
@@ -127,7 +127,7 @@ public class InventorySystem : MonoBehaviour
     public void DropItem(int slotIndex)
     {
         if (slotIndex < 0 || slotIndex >= inventory.Count) return;
-        
+
         Item item = inventory[slotIndex];
         if (item != null)
         {
@@ -135,8 +135,22 @@ public class InventorySystem : MonoBehaviour
             Vector2 dropPosition = (Vector2)transform.position + Random.insideUnitCircle * 1.5f;
             item.OnDrop(dropPosition);
             inventory[slotIndex] = null;
-            
+
             Debug.Log($"Выброшен предмет: {item.itemName} из слота {slotIndex + 1}");
+        }
+    }
+    
+        public void RemoveItem(int slotIndex)
+    {
+        if (slotIndex < 0 || slotIndex >= inventory.Count) return;
+        
+        Item item = inventory[slotIndex];
+        if (item != null)
+        {
+            // Удаляем предмет
+            inventory[slotIndex] = null;
+            
+            Debug.Log($"Удалён предмет: {item.itemName} из слота {slotIndex + 1}");
         }
     }
 
@@ -172,19 +186,24 @@ public class InventorySystem : MonoBehaviour
     }
 
     // Публичные методы для доступа из других скриптов
-    public bool HasItem(Item item)
+    public int HasItem(Item item)
     {
-        return inventory.Contains(item);
+        if (inventory.Contains(item))
+        {
+            return inventory.IndexOf(item);
+        }
+
+        return -1;
     }
     
-    public bool HasItemOfType(System.Type itemType)
+    public int HasItemByName(string name)
     {
         foreach (Item item in inventory)
         {
-            if (item != null && item.GetType() == itemType)
-                return true;
+            if (item != null && item.itemName == name)
+                return inventory.IndexOf(item);
         }
-        return false;
+        return -1;
     }
     
     public int GetItemCount()
