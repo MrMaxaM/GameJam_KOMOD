@@ -14,6 +14,10 @@ public class Item : MonoBehaviour
     {
         itemCollider = GetComponent<Collider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        if (icon == null)
+        {
+            icon = spriteRenderer.sprite;
+        }
     }
 
     public void OnPickup(InventorySystem collector)

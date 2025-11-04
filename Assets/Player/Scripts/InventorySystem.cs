@@ -132,7 +132,7 @@ public class InventorySystem : MonoBehaviour
         if (item != null)
         {
             // Выбрасываем предмет
-            Vector2 dropPosition = (Vector2)transform.position + Random.insideUnitCircle * 1.5f;
+            Vector2 dropPosition = (Vector2)transform.position + Random.insideUnitCircle * 0.3f;
             item.OnDrop(dropPosition);
             inventory[slotIndex] = null;
 

@@ -13,6 +13,7 @@ public class CameraFollow : MonoBehaviour
         
         Vector3 targetPosition = target.position;
         targetPosition.z = -10f;
+        targetPosition.y += 0.4f;
         
         transform.position = Vector3.SmoothDamp(
             transform.position, 
