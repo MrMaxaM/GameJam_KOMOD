@@ -1,6 +1,9 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
+using UnityEngine.Audio;
+
 
 public class RageAI : MonoBehaviour
 {
@@ -46,6 +49,14 @@ public class RageAI : MonoBehaviour
     private Animator animator;
     private Vector2 move;
 
+    private PlaylistManager playlistManager;
+
+    public AudioClip attackClip;           // звук атаки
+    public AudioClip[] chaseClips;         // набор звуков для преследования
+
+    private AudioSource audioSource;
+    private Coroutine chaseSoundRoutine;
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -60,7 +71,11 @@ public class RageAI : MonoBehaviour
         animator = GetComponent<Animator>();
         
         spriteRenderer = GetComponent<SpriteRenderer>();
-        
+        playlistManager = FindFirstObjectByType<PlaylistManager>();
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
+
         SetWanderDestination();
     }
 
@@ -293,6 +308,9 @@ public class RageAI : MonoBehaviour
         agent.speed = wanderSpeed;
         agent.isStopped = false;
         SetWanderDestination();
+
+        playlistManager.PlayPlaylist("RageCalm");
+        StopChaseSounds();
     }
 
     void StartChasing()
@@ -301,6 +319,10 @@ public class RageAI : MonoBehaviour
         agent.speed = chaseSpeed;
         agent.isStopped = false;
         lastHeardPosition = player.position;
+
+        playlistManager.PlayPlaylist("RageChasing");
+        StartChaseSounds();
+
     }
 
     void StartSearching()
@@ -308,6 +330,70 @@ public class RageAI : MonoBehaviour
         currentState = AIState.Searching;
         agent.SetDestination(lastHeardPosition);
         stateTimer = waitTimeAtPoint;
+        playlistManager.PlayPlaylist("RageSearching");
+
+        StopChaseSounds();
+    }
+
+        public void StartDying()
+    {
+        Debug.Log($"СМЭРТЬ!");
+        currentState = AIState.Dying;
+        agent.isStopped = true;
+        StartCoroutine(DeathAnimation());
+    }
+
+    private IEnumerator DeathAnimation()
+    {
+        // Отключаем физику и коллайдер
+        if (monsterCollider != null)
+            monsterCollider.enabled = false;
+
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.bodyType = RigidbodyType2D.Kinematic; // Отключаем физическое воздействие
+        }
+        
+        yield return new WaitForSeconds(0.4f);
+
+        // Спавним партиклы смерти
+        if (deathParticlesPrefab != null)
+        {
+            GameObject particles = Instantiate(deathParticlesPrefab, transform.position, Quaternion.identity);
+        }
+
+        float currentSpeed = 0.1f;
+        float fadeTimer = 0f;
+        Color originalColor = spriteRenderer.color;
+        Vector3 originalPosition = transform.position;
+
+        // Анимация подъёма и исчезновения
+        while (fadeTimer < 4f)
+        {
+            // Поднимаем вверх с ускорением
+            currentSpeed += 0.1f * Time.deltaTime;
+            transform.position += Vector3.up * currentSpeed * Time.deltaTime;
+
+            // Плавное исчезновение
+            fadeTimer += Time.deltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, fadeTimer / 4f);
+            spriteRenderer.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
+
+            yield return null;
+        }
+
+        // Спавним предмет на оригинальной позиции монстра
+        if (itemDropPrefab != null)
+        {
+            Instantiate(itemDropPrefab, originalPosition, Quaternion.identity);
+        }
+
+        // Ждём немного перед уничтожением
+        yield return new WaitForSeconds(1f);
+
+        // Уничтожаем монстра
+        Destroy(gameObject);
     }
 
         public void StartDying()
@@ -389,4 +475,41 @@ public class RageAI : MonoBehaviour
         Gizmos.color = Color.magenta;
         Gizmos.DrawWireSphere(lastHeardPosition, 0.3f);
     }
+
+    //
+
+    void PlaySound(AudioClip clip)
+    {
+        if (clip != null)
+            audioSource.PlayOneShot(clip);
+    }
+
+    void StartChaseSounds()
+    {
+        StopChaseSounds();
+        if (chaseClips != null && chaseClips.Length > 0)
+            chaseSoundRoutine = StartCoroutine(PlayRandomChaseSounds());
+    }
+
+    void StopChaseSounds()
+    {
+        if (chaseSoundRoutine != null)
+        {
+            StopCoroutine(chaseSoundRoutine);
+            chaseSoundRoutine = null;
+        }
+    }
+
+    IEnumerator PlayRandomChaseSounds()
+    {
+        while (currentState == AIState.Chasing)
+        {
+            float wait = Random.Range(3f, 8f);               // интервал между звуками
+            yield return new WaitForSeconds(wait);
+
+            var clip = chaseClips[Random.Range(0, chaseClips.Length)];
+            PlaySound(clip);
+        }
+    }
 }
+
