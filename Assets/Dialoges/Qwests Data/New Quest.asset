@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f067250ccbb15c41826bae099337009, type: 3}
   m_Name: New Quest
   m_EditorClassIdentifier: 
-  questName: 1
-  requiredState: find1
+  questName: ElevatorQuest
+  requiredState: win
   requiredItems:
-  - {fileID: 3635036907586681146, guid: 57d89c33fcf18014695bcd15c539650b, type: 3}
-  completionState: find2
-  completionDialogue: {fileID: 11400000, guid: 3cd991971e2871740827c02097ea3af9, type: 2}
-  failureDialogue: {fileID: 11400000, guid: 3569969cf92c30d4489aa32d997499da, type: 2}
+  - {fileID: 6739916415474034942, guid: 6d425c196a64874479a876c9bb534ef1, type: 3}
+  completionState: end
+  completionDialogue: {fileID: 0}
+  failureDialogue: {fileID: 11400000, guid: 4468277189c7dfd44ac33f8bebdec0fc, type: 2}

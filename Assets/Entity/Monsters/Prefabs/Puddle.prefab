@@ -29,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -5.6077695, y: 3.3696332, z: 0}
-  m_LocalScale: {x: 1, y: 0.5, z: 1}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -77,9 +77,9 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 0.2837424, g: 0.5396226, b: 0.17817722, a: 1}
+  m_SortingOrder: -1
+  m_Sprite: {fileID: -8702414712254167719, guid: 8d0cc5b7f0432c342913c579c5ca3fef, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -101,8 +101,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5cd0ea5c28ecb14191fcebcc5a50440, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSize: 3
-  growthSpeed: 0.5
+  maxSize: 0.5
+  growthSpeed: 0.1
   lifeDuration: 12
   spawnMonsterRange: 2
   growthCurve:
@@ -166,5 +166,5 @@ CapsuleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 0.9, y: 1}
+  m_Size: {x: 6.4, y: 2}
   m_Direction: 1

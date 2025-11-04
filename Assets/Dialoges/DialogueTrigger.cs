@@ -329,6 +329,15 @@ public class DialogueTrigger : MonoBehaviour
                 StartSpecificDialogue(newDialogue);
             }
         }
+        if (newState == "end")
+        {
+            EndDialogue();
+            gameObject.SetActive(false);
+        }
+        if (newState == "win")
+        {
+            EndDialogue();
+        }
     }
     
     void ShowInteractionHint()

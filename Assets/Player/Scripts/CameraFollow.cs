@@ -4,8 +4,13 @@ public class CameraFollow : MonoBehaviour
 {
     public Transform target;
     public float smoothTime = 0.3f;
-    
+
     private Vector3 velocity = Vector3.zero;
+
+    void Start()
+    {
+        Fade.Instance.FadeFromBlack(2f);
+    }
 
     void LateUpdate()
     {

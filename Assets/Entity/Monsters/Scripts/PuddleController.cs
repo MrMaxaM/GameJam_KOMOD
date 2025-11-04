@@ -122,7 +122,7 @@ public class PuddleController : MonoBehaviour
         }
     }
     
-    void Disappear()
+    public void Disappear()
     {
         if (spawnedMonster != null)
         {

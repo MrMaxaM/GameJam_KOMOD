@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f067250ccbb15c41826bae099337009, type: 3}
+  m_Name: 3
+  m_EditorClassIdentifier: 
+  questName: 3floor
+  requiredState: find1
+  requiredItems:
+  - {fileID: 5920977710302285423, guid: 23c4c777dfa7b7d478eff6fb5fdec040, type: 3}
+  - {fileID: 4778857566063402191, guid: 355648e3be4456f47a42bccfcf919923, type: 3}
+  - {fileID: 4723239631652422831, guid: b3fd0a31eb804344689b1f47a23fd4af, type: 3}
+  completionState: find2
+  completionDialogue: {fileID: 11400000, guid: 2650f5e17ad38f44d9eb0dd5e1277224, type: 2}
+  failureDialogue: {fileID: 11400000, guid: 1e1a2bd5e15195448ade5078b051df1f, type: 2}

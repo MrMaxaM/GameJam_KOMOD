@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections;
 
 public class RageAI : MonoBehaviour
 {
@@ -19,6 +20,8 @@ public class RageAI : MonoBehaviour
     public float chargeSpeed = 8f;
     public float chargeDuration = 0.5f;
     public float playerKnockbackForce = 5f;
+    public GameObject deathParticlesPrefab;
+    public GameObject itemDropPrefab; 
     
     [Header("Destruction")]
     public GameObject destructionEffect;
@@ -32,11 +35,16 @@ public class RageAI : MonoBehaviour
     private float stateTimer;
     private float attackTimer;
     
-    private enum AIState { Wandering, Chasing, PreparingCharge, Charging, Searching }
+    private enum AIState { Wandering, Chasing, PreparingCharge, Charging, Searching, Dying }
     private AIState currentState = AIState.Wandering;
     
     private Vector3 chargeDirection;
     private float chargeTimer;
+    private SpriteRenderer spriteRenderer;
+    private Collider2D monsterCollider;
+    private Rigidbody2D rb;
+    private Animator animator;
+    private Vector2 move;
 
     void Start()
     {
@@ -47,6 +55,11 @@ public class RageAI : MonoBehaviour
         currentHearingRange = normalHearingRange;
         agent.updateRotation = false;
         agent.updateUpAxis = false;
+        rb = GetComponent<Rigidbody2D>();
+        monsterCollider = GetComponent<Collider2D>();
+        animator = GetComponent<Animator>();
+        
+        spriteRenderer = GetComponent<SpriteRenderer>();
         
         SetWanderDestination();
     }
@@ -55,7 +68,9 @@ public class RageAI : MonoBehaviour
     {
         UpdateTimers();
         UpdateHearingRange();
-        
+
+        move = agent.velocity;
+
         switch (currentState)
         {
             case AIState.Wandering:
@@ -69,11 +84,24 @@ public class RageAI : MonoBehaviour
                 break;
             case AIState.Charging:
                 UpdateCharging();
+                move = rb.linearVelocity;
                 break;
             case AIState.Searching:
                 UpdateSearching();
                 break;
         }
+        
+        // Обновляем последнее направление если есть движение
+        if (move.magnitude > 0.1f)
+        {
+            animator.SetFloat("RLastX", move.x);
+        }
+        
+        // Устанавливаем параметры движения
+        animator.SetFloat("RX", move.x);
+        
+        // Устанавливаем булевые параметры
+        animator.SetBool("RisWalking", move.magnitude > 0.1f || currentState == AIState.Charging);
     }
 
     void UpdateTimers()
@@ -280,6 +308,67 @@ public class RageAI : MonoBehaviour
         currentState = AIState.Searching;
         agent.SetDestination(lastHeardPosition);
         stateTimer = waitTimeAtPoint;
+    }
+
+        public void StartDying()
+    {
+        Debug.Log($"СМЭРТЬ!");
+        currentState = AIState.Dying;
+        agent.isStopped = true;
+        StartCoroutine(DeathAnimation());
+    }
+
+    private IEnumerator DeathAnimation()
+    {
+        // Отключаем физику и коллайдер
+        if (monsterCollider != null)
+            monsterCollider.enabled = false;
+
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.bodyType = RigidbodyType2D.Kinematic; // Отключаем физическое воздействие
+        }
+        
+        yield return new WaitForSeconds(0.4f);
+
+        // Спавним партиклы смерти
+        if (deathParticlesPrefab != null)
+        {
+            GameObject particles = Instantiate(deathParticlesPrefab, transform.position, Quaternion.identity);
+        }
+
+        float currentSpeed = 0.1f;
+        float fadeTimer = 0f;
+        Color originalColor = spriteRenderer.color;
+        Vector3 originalPosition = transform.position;
+
+        // Анимация подъёма и исчезновения
+        while (fadeTimer < 4f)
+        {
+            // Поднимаем вверх с ускорением
+            currentSpeed += 0.1f * Time.deltaTime;
+            transform.position += Vector3.up * currentSpeed * Time.deltaTime;
+
+            // Плавное исчезновение
+            fadeTimer += Time.deltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, fadeTimer / 4f);
+            spriteRenderer.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
+
+            yield return null;
+        }
+
+        // Спавним предмет на оригинальной позиции монстра
+        if (itemDropPrefab != null)
+        {
+            Instantiate(itemDropPrefab, originalPosition, Quaternion.identity);
+        }
+
+        // Ждём немного перед уничтожением
+        yield return new WaitForSeconds(1f);
+
+        // Уничтожаем монстра
+        Destroy(gameObject);
     }
 
     // Визуализация в редакторе

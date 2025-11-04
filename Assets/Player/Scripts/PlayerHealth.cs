@@ -34,6 +34,7 @@ public class PlayerHealth : MonoBehaviour
 
     void Die()
     {
+        Fade.Instance.FadeInOut(1f);
         playerController.canMove = false;
         GetComponent<InventorySystem>().DropAllItems();
         OnPlayerDeath?.Invoke();

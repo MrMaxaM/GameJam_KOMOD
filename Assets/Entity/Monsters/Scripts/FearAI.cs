@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections;
 
 public class FearAI : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class FearAI : MonoBehaviour
     public float hidingTime = 18f;
     public float dashDistance = 3f;
     public float dashDuration = 0.5f;
+    public GameObject deathParticlesPrefab;
+    public GameObject itemDropPrefab; 
 
     [Header("Visual Settings")]
     public float darkenIntensity = 0.5f;
@@ -35,9 +38,12 @@ public class FearAI : MonoBehaviour
     private HideController hideController;
     private SpriteRenderer spriteRenderer;
     private Color originalColor;
+    private Collider2D monsterCollider;
     private Rigidbody2D rb;
     private int currentWanderPointIndex = -1;
-    private enum AIState { Wandering, Waiting, Chasing, Attacking, Searching, Dashing }
+    private enum AIState { Wandering, Waiting, Chasing, Attacking, Searching, Dashing, Dying }
+    private Animator animator;
+    private Vector2 move;
 
 
     void Start()
@@ -49,6 +55,8 @@ public class FearAI : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player").transform;
         hideController = GameObject.FindGameObjectWithTag("Player").GetComponent<HideController>();
         rb = GetComponent<Rigidbody2D>();
+        monsterCollider = GetComponent<Collider2D>();
+        animator = GetComponent<Animator>();
         
         spriteRenderer = GetComponent<SpriteRenderer>();
         
@@ -63,7 +71,9 @@ public class FearAI : MonoBehaviour
     void Update()
     {
         UpdateTimers();
-        
+
+        move = agent.velocity;
+
         switch (currentState)
         {
             case AIState.Wandering:
@@ -85,6 +95,18 @@ public class FearAI : MonoBehaviour
                 UpdateDashing();
                 break;
         }
+        
+        // Обновляем последнее направление если есть движение
+        if (move.magnitude > 0.1f)
+        {
+            animator.SetFloat("LastX", move.x);
+        }
+        
+        // Устанавливаем параметры движения
+        animator.SetFloat("X", move.x);
+        
+        // Устанавливаем булевые параметры
+        animator.SetBool("isWalking", move.magnitude > 0.1f);
     }
 
     void UpdateTimers()
@@ -144,6 +166,7 @@ public class FearAI : MonoBehaviour
     void UpdateAttacking()
     {
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        Debug.Log($"{distanceToPlayer}, {attackRange}");
         if (distanceToPlayer > attackRange)
         {
             StartChasing();
@@ -273,24 +296,85 @@ public class FearAI : MonoBehaviour
         ResetAppearance();
     }
 
-        void StartDashing()
+    void StartDashing()
     {
         currentState = AIState.Dashing;
         agent.isStopped = true;
-        
+
         // Вычисляем направление и цель рывка
         Vector3 directionToPlayer = (player.position - transform.position).normalized;
         dashTarget = transform.position + directionToPlayer * dashDistance;
-        
+
         // Убеждаемся, что точка рывка доступна на NavMesh
         NavMeshHit hit;
         if (NavMesh.SamplePosition(dashTarget, out hit, 2f, NavMesh.AllAreas))
         {
             dashTarget = hit.position;
         }
-        
+
         dashTimer = dashDuration;
         ResetAppearance();
+    }
+
+    public void StartDying()
+    {
+        Debug.Log($"СМЭРТЬ!");
+        currentState = AIState.Dying;
+        agent.isStopped = true;
+        StartCoroutine(DeathAnimation());
+    }
+
+    private IEnumerator DeathAnimation()
+    {
+        // Отключаем физику и коллайдер
+        if (monsterCollider != null)
+            monsterCollider.enabled = false;
+
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.bodyType = RigidbodyType2D.Kinematic; // Отключаем физическое воздействие
+        }
+        
+        yield return new WaitForSeconds(0.4f);
+
+        // Спавним партиклы смерти
+        if (deathParticlesPrefab != null)
+        {
+            GameObject particles = Instantiate(deathParticlesPrefab, transform.position, Quaternion.identity);
+        }
+
+        float currentSpeed = 0.1f;
+        float fadeTimer = 0f;
+        Color originalColor = spriteRenderer.color;
+        Vector3 originalPosition = transform.position;
+
+        // Анимация подъёма и исчезновения
+        while (fadeTimer < 4f)
+        {
+            // Поднимаем вверх с ускорением
+            currentSpeed += 0.1f * Time.deltaTime;
+            transform.position += Vector3.up * currentSpeed * Time.deltaTime;
+
+            // Плавное исчезновение
+            fadeTimer += Time.deltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, fadeTimer / 4f);
+            spriteRenderer.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
+
+            yield return null;
+        }
+
+        // Спавним предмет на оригинальной позиции монстра
+        if (itemDropPrefab != null)
+        {
+            Instantiate(itemDropPrefab, originalPosition, Quaternion.identity);
+        }
+
+        // Ждём немного перед уничтожением
+        yield return new WaitForSeconds(1f);
+
+        // Уничтожаем монстра
+        Destroy(gameObject);
     }
 
     void PerformAttack()

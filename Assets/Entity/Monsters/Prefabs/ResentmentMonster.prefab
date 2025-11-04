@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2126149958520592632}
   - component: {fileID: 3486232329838140420}
   - component: {fileID: 1835876100846117591}
+  - component: {fileID: 3367675593740047241}
   m_Layer: 0
   m_Name: ResentmentMonster
   m_TagString: Untagged
@@ -31,7 +32,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 8.02, y: -3.55, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.08, y: 0.08, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -80,8 +81,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee, type: 3}
-  m_Color: {r: 0.21306515, g: 0.6603774, b: 0.4083768, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 08772fd38dd2d21459c73d26cb99998c, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -90,7 +91,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!58 &8753366254048680641
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -188,13 +189,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1dafadaf7431cf54b8c0b0a1c6c42676, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectionRange: 8
-  attackRange: 2
+  detectionRange: 4
+  attackRange: 1.5
   returnToPuddleDistance: 10
-  chaseSpeed: 3.5
+  chaseSpeed: 3.2
   wanderArea: {fileID: 0}
   attackCooldown: 1.5
   attackTimer: 0
   currentState: 0
   stateTimer: 0
   lastKnownPlayerPosition: {x: 0, y: 0, z: 0}
+--- !u!95 &3367675593740047241
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8668124833708236391}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: c740cb2c90a08124999402821f8a0a40, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

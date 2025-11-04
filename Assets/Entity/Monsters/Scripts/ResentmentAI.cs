@@ -26,6 +26,9 @@ public class ResentmentAI : MonoBehaviour
     private PuddleController homePuddle;
     private Vector3 puddlePosition;
     private enum AIState { Idle, Chasing, Attacking, Returning, Searching }
+    private Animator animator;
+    private Vector2 move;
+
 
 
     void Start()
@@ -36,11 +39,14 @@ public class ResentmentAI : MonoBehaviour
         agent.speed = chaseSpeed;
         player = GameObject.FindGameObjectWithTag("Player").transform;
         hideController = GameObject.FindGameObjectWithTag("Player").GetComponent<HideController>();
+        animator = GetComponent<Animator>();
     }
 
     void Update()
     {
         UpdateTimers();
+
+        move = agent.velocity;
 
         switch (currentState)
         {
@@ -60,6 +66,18 @@ public class ResentmentAI : MonoBehaviour
                 UpdateSearching();
                 break;
         }
+
+        // Обновляем последнее направление если есть движение
+        if (move.magnitude > 0.1f)
+        {
+            animator.SetFloat("LastX", move.x);
+        }
+        
+        // Устанавливаем параметры движения
+        animator.SetFloat("X", move.x);
+        
+        // Устанавливаем булевые параметры
+        animator.SetBool("isWalking", move.magnitude > 0.1f);
     }
     
     void UpdateTimers()
@@ -196,7 +214,7 @@ public class ResentmentAI : MonoBehaviour
         stateTimer = 2f;
         agent.isStopped = false;
     }
-    
+
     void StartReturning()
     {
         currentState = AIState.Returning;

@@ -64,22 +64,32 @@ public class PuddleSpawner : MonoBehaviour
         activePuddles.Remove(puddle);
         currentPuddleCount = Mathf.Max(0, currentPuddleCount - 1);
     }
-    
+
     Vector3 GetRandomSpawnPosition()
     {
         Bounds bounds = spawnArea.bounds;
-        
+
         float randomX = Random.Range(bounds.min.x, bounds.max.x);
         float randomY = Random.Range(bounds.min.y, bounds.max.y);
-        
-        Vector3 randomPoint = new Vector3(randomX, randomY, 0);
-        
+
+        Vector3 randomPoint = new Vector3(randomX, randomY, 2);
+
         NavMeshHit hit;
         if (NavMesh.SamplePosition(randomPoint, out hit, 2f, NavMesh.AllAreas))
         {
             return hit.position;
         }
-        
+
         return randomPoint;
+    }
+    
+    public void DeleteAll()
+    {
+        foreach(PuddleController pc in activePuddles)
+        {
+            pc.Disappear();
+            currentPuddleCount = 0;
+            maxPuddles = 0;
+        }
     }
 }
