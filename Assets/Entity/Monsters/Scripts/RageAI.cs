@@ -1,5 +1,8 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Audio;
+
 
 public class RageAI : MonoBehaviour
 {
@@ -38,6 +41,14 @@ public class RageAI : MonoBehaviour
     private Vector3 chargeDirection;
     private float chargeTimer;
 
+    private PlaylistManager playlistManager;
+
+    public AudioClip attackClip;           // звук атаки
+    public AudioClip[] chaseClips;         // набор звуков для преследования
+
+    private AudioSource audioSource;
+    private Coroutine chaseSoundRoutine;
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -47,7 +58,11 @@ public class RageAI : MonoBehaviour
         currentHearingRange = normalHearingRange;
         agent.updateRotation = false;
         agent.updateUpAxis = false;
-        
+        playlistManager = FindFirstObjectByType<PlaylistManager>();
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
+
         SetWanderDestination();
     }
 
@@ -265,6 +280,9 @@ public class RageAI : MonoBehaviour
         agent.speed = wanderSpeed;
         agent.isStopped = false;
         SetWanderDestination();
+
+        playlistManager.PlayPlaylist("RageCalm");
+        StopChaseSounds();
     }
 
     void StartChasing()
@@ -273,6 +291,10 @@ public class RageAI : MonoBehaviour
         agent.speed = chaseSpeed;
         agent.isStopped = false;
         lastHeardPosition = player.position;
+
+        playlistManager.PlayPlaylist("RageChasing");
+        StartChaseSounds();
+
     }
 
     void StartSearching()
@@ -280,6 +302,9 @@ public class RageAI : MonoBehaviour
         currentState = AIState.Searching;
         agent.SetDestination(lastHeardPosition);
         stateTimer = waitTimeAtPoint;
+        playlistManager.PlayPlaylist("RageSearching");
+
+        StopChaseSounds();
     }
 
     // Визуализация в редакторе
@@ -300,4 +325,41 @@ public class RageAI : MonoBehaviour
         Gizmos.color = Color.magenta;
         Gizmos.DrawWireSphere(lastHeardPosition, 0.3f);
     }
+
+    //
+
+    void PlaySound(AudioClip clip)
+    {
+        if (clip != null)
+            audioSource.PlayOneShot(clip);
+    }
+
+    void StartChaseSounds()
+    {
+        StopChaseSounds();
+        if (chaseClips != null && chaseClips.Length > 0)
+            chaseSoundRoutine = StartCoroutine(PlayRandomChaseSounds());
+    }
+
+    void StopChaseSounds()
+    {
+        if (chaseSoundRoutine != null)
+        {
+            StopCoroutine(chaseSoundRoutine);
+            chaseSoundRoutine = null;
+        }
+    }
+
+    IEnumerator PlayRandomChaseSounds()
+    {
+        while (currentState == AIState.Chasing)
+        {
+            float wait = Random.Range(3f, 8f);               // интервал между звуками
+            yield return new WaitForSeconds(wait);
+
+            var clip = chaseClips[Random.Range(0, chaseClips.Length)];
+            PlaySound(clip);
+        }
+    }
 }
+

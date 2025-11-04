@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Audio;
 
 public class FearAI : MonoBehaviour
 {
@@ -39,6 +40,12 @@ public class FearAI : MonoBehaviour
     private int currentWanderPointIndex = -1;
     private enum AIState { Wandering, Waiting, Chasing, Attacking, Searching, Dashing }
 
+    private PlaylistManager playlistManager;
+
+    public AudioClip attackClip;           // звук атаки
+
+    private AudioSource audioSource;
+
 
     void Start()
     {
@@ -49,7 +56,11 @@ public class FearAI : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player").transform;
         hideController = GameObject.FindGameObjectWithTag("Player").GetComponent<HideController>();
         rb = GetComponent<Rigidbody2D>();
-        
+        playlistManager = FindFirstObjectByType<PlaylistManager>();
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
+
         spriteRenderer = GetComponent<SpriteRenderer>();
         
         if (spriteRenderer != null)
@@ -236,6 +247,7 @@ public class FearAI : MonoBehaviour
         agent.isStopped = true;
         stateTimer = hidingTime;
         DarkenAppearance();
+        playlistManager.PlayPlaylist("FearWaiting");
     }
     
     void StartWandering()
@@ -245,6 +257,7 @@ public class FearAI : MonoBehaviour
         agent.isStopped = false;
         ResetAppearance();
         SetWanderDestination();
+        playlistManager.PlayPlaylist("FearWandering");
     }
 
     void StartChasing()
@@ -254,6 +267,7 @@ public class FearAI : MonoBehaviour
         agent.speed = chaseSpeed;
         agent.isStopped = false;
         ResetAppearance();
+        playlistManager.PlayPlaylist("FearChasing");
     }
 
     void StartAttacking()
@@ -262,6 +276,10 @@ public class FearAI : MonoBehaviour
         agent.isStopped = true;
         attackTimer = 0;
         ResetAppearance();
+        PlaySound(attackClip);
+
+        if (playlistManager != null)
+            playlistManager.PlayPlaylist("FearChasing");
     }
 
     void StartSearching()
@@ -335,5 +353,13 @@ public class FearAI : MonoBehaviour
             Gizmos.color = Color.green;
             Gizmos.DrawLine(transform.position, player.position);
         }
+    }
+
+    //
+
+    void PlaySound(AudioClip clip)
+    {
+        if (clip != null)
+            audioSource.PlayOneShot(clip);
     }
 }

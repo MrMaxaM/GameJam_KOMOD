@@ -11,13 +11,22 @@ public class PlayerController : MonoBehaviour
     public bool isCrouching;
     private bool isSlowed = false;
 
+    [Header("Footstep Settings")]
+    public AudioClip[] footstepClips;   // набор шагов
+    public float stepInterval = 0.4f;   // задержка между шагами
+    public float volume = 0.6f;
+
+    private float stepTimer;
+    private AudioSource audioSource;
     private Vector2 smoothVelocity;
     private Rigidbody2D rb;
     private InputAction crouchAction;
 
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        audioSource = GetComponent<AudioSource>();
         crouchAction = InputSystem.actions.FindAction("Crouch");
     }
 
@@ -36,8 +45,28 @@ public class PlayerController : MonoBehaviour
         Vector2 move = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
         rb.linearVelocity = Vector2.SmoothDamp(rb.linearVelocity, move * currentSpeed,
                                                 ref smoothVelocity, smoothTime);
+
+        HandleFootsteps(move);
     }
-    
+
+    void HandleFootsteps(Vector2 move)
+    {
+        if (move.magnitude > 0.1f && rb.linearVelocity.magnitude > 0.1f)
+        {
+            stepTimer -= Time.fixedDeltaTime;
+            if (stepTimer <= 0f && footstepClips.Length > 0)
+            {
+                AudioClip clip = footstepClips[Random.Range(0, footstepClips.Length)];
+                audioSource.PlayOneShot(clip, volume);
+                stepTimer = stepInterval / (rb.linearVelocity.magnitude / normalSpeed + 0.1f);
+            }
+        }
+        else
+        {
+            stepTimer = 0f;
+        }
+    }
+
     public void ApplySlow()
     {
         isSlowed = true;

@@ -5,7 +5,7 @@ using UnityEngine;
 // Если верить gpt, можно вызывать в любом скрипте так:
 // FindObjectOfType<AudioSequenceManager>().PlayPlaylist("ТутНазваниеПоследовательности");
 
-public class AudioSequenceManager : MonoBehaviour
+public class PlaylistManager : MonoBehaviour
 {
     [System.Serializable]
     public class Playlist
