@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Позволяет выбирать, какую музыку (последовательность файлов) воспроизводить
-// Если верить gpt, можно вызывать в любом скрипте так:
-// FindObjectOfType<AudioSequenceManager>().PlayPlaylist("ТутНазваниеПоследовательности");
 
 public class PlaylistManager : MonoBehaviour
 {

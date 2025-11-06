@@ -310,7 +310,7 @@ public class RageAI : MonoBehaviour
         agent.isStopped = false;
         SetWanderDestination();
 
-        //playlistManager.PlayPlaylist("RageCalm");
+        playlistManager.PlayPlaylist("RageCalm");
         StopChaseSounds();
     }
 
@@ -321,7 +321,7 @@ public class RageAI : MonoBehaviour
         agent.isStopped = false;
         lastHeardPosition = player.position;
 
-        //playlistManager.PlayPlaylist("RageChasing");
+        playlistManager.PlayPlaylist("RageChasing");
         StartChaseSounds();
 
     }
@@ -331,7 +331,7 @@ public class RageAI : MonoBehaviour
         currentState = AIState.Searching;
         agent.SetDestination(lastHeardPosition);
         stateTimer = waitTimeAtPoint;
-        //playlistManager.PlayPlaylist("RageSearching");
+        playlistManager.PlayPlaylist("RageSearching");
 
         StopChaseSounds();
     }
