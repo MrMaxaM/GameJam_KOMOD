@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.AI;
+using Unity.VisualScripting;
 
 public class PuddleSpawner : MonoBehaviour
 {
@@ -72,7 +73,7 @@ public class PuddleSpawner : MonoBehaviour
         float randomX = Random.Range(bounds.min.x, bounds.max.x);
         float randomY = Random.Range(bounds.min.y, bounds.max.y);
 
-        Vector3 randomPoint = new Vector3(randomX, randomY, 2);
+        Vector3 randomPoint = new Vector3(randomX, randomY, 0);
 
         NavMeshHit hit;
         if (NavMesh.SamplePosition(randomPoint, out hit, 2f, NavMesh.AllAreas))
@@ -87,7 +88,7 @@ public class PuddleSpawner : MonoBehaviour
     {
         foreach(PuddleController pc in activePuddles)
         {
-            pc.Disappear();
+            Destroy(pc.gameObject);
             currentPuddleCount = 0;
             maxPuddles = 0;
         }

@@ -52,12 +52,6 @@ public class FearAI : MonoBehaviour
 
     private AudioSource audioSource;
 
-    private PlaylistManager playlistManager;
-
-    public AudioClip attackClip;           // звук атаки
-
-    private AudioSource audioSource;
-
 
     void Start()
     {
@@ -303,9 +297,7 @@ public class FearAI : MonoBehaviour
     {
         currentState = AIState.Attacking;
         agent.isStopped = true;
-        attackTimer = 0;
         ResetAppearance();
-        PlaySound(attackClip);
 
         if (playlistManager != null)
             playlistManager.PlayPlaylist("FearChasing");
@@ -335,6 +327,8 @@ public class FearAI : MonoBehaviour
         {
             dashTarget = hit.position;
         }
+        
+        PlaySound(attackClip);
 
         dashTimer = dashDuration;
         ResetAppearance();

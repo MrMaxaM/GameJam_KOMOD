@@ -164,7 +164,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 8668124833708236391}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 0.2
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -190,15 +190,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   detectionRange: 4
-  attackRange: 1.5
-  returnToPuddleDistance: 10
-  chaseSpeed: 3.2
+  attackRange: 1
+  returnToPuddleDistance: 8
+  chaseSpeed: 3
   wanderArea: {fileID: 0}
+  spawnParticlesPrefab: {fileID: 2182809624648979585, guid: c82e6c757caeaeb4ca58284ae2ee9b97, type: 3}
   attackCooldown: 1.5
   attackTimer: 0
   currentState: 0
   stateTimer: 0
   lastKnownPlayerPosition: {x: 0, y: 0, z: 0}
+  spawnClip: {fileID: 8300000, guid: 7212f9ac55a00b040ad5c8b525f85d7e, type: 3}
+  chaseClip: {fileID: 8300000, guid: d09c00c95af922c4ea3c8b185399bafa, type: 3}
+  attackClip: {fileID: 8300000, guid: 804d1b4271bf4bf48a5006d351af6638, type: 3}
 --- !u!95 &3367675593740047241
 Animator:
   serializedVersion: 7

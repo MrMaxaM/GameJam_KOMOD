@@ -164,7 +164,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 6806672688990919878}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 0.2
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -189,21 +189,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d87f91d9c6e306f4f964b2108d92f575, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectionRange: 5
-  attackRange: 1.5
+  detectionRange: 4.5
+  attackRange: 1
   waitTimeAtPoint: 2
   sightWaitTime: 3
   wanderSpeed: 1.5
-  chaseSpeed: 3.5
+  chaseSpeed: 3
   wanderPoints:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  hidingTime: 18
-  dashDistance: 3
-  dashDuration: 0.5
+  hidingTime: 15
+  dashDistance: 2.5
+  dashDuration: 0.4
   deathParticlesPrefab: {fileID: 995802282486592951, guid: d08cbeeab013bba42bb1105f5803a15b, type: 3}
   itemDropPrefab: {fileID: 2024121175974331009, guid: 6d425c196a64874479a876c9bb534ef1, type: 3}
   darkenIntensity: 0.5
@@ -215,6 +215,7 @@ MonoBehaviour:
   currentState: 0
   dashTimer: 0
   dashTarget: {x: 0, y: 0, z: 0}
+  attackClip: {fileID: 0}
 --- !u!95 &8864784580151021044
 Animator:
   serializedVersion: 7

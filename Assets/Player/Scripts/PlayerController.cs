@@ -77,7 +77,7 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("isWalking", movement.magnitude > 0.1f);
         animator.SetBool("isCrouching", isCrouching);
 
-        if (spriteRenderer == null || !flipSpriteForLeft) return;
+        if (spriteRenderer == null) return;
 
         // Отражаем спрайт только по горизонтали
         if (movement.x < -0.1f) // Движение влево

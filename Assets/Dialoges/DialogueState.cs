@@ -10,14 +10,25 @@ public class DialogueState : MonoBehaviour
     public Transform playerTpPoint;
     public FearAI fearAI;
     public RageAI rageAI;
-    public FakeResentment resentment;
+    public FakeResentment fakeMonster;
     public PuddleSpawner ps;
     public Transform monsterTpPoint;
     public string sceneToLoad;
     public ElevAnim[] elevAnims;
-    
+    public AudioClip deathClip;
+    public AudioClip elevOpenClip;
+    public AudioClip elevCloseClip;
+
+    private AudioSource audioSource;
+
+
     // Событие при изменении состояния
     public System.Action<string> OnStateChanged;
+    void Start()
+    {
+        
+        PlaySound(elevCloseClip);
+    }
 
     void Awake()
     {
@@ -43,7 +54,7 @@ public class DialogueState : MonoBehaviour
         if (newState == "win")
         {
             Fade.Instance.FadeInOut(1f);
-            Invoke(nameof(StartWin),1f);
+            Invoke(nameof(StartWin), 1f);
         }
 
         if (newState == "end")
@@ -51,6 +62,7 @@ public class DialogueState : MonoBehaviour
             foreach (ElevAnim elevAnim in elevAnims)
             {
                 elevAnim.PlayBackward();
+                PlaySound(elevOpenClip);
                 Fade.Instance.FadeToBlack(1f);
                 Invoke(nameof(LoadSceneByName), 1f);
             }
@@ -69,7 +81,7 @@ public class DialogueState : MonoBehaviour
             SceneManager.LoadScene(sceneToLoad);
         }
     }
-    
+
     public void StartWin()
     {
         if (playerController != null)
@@ -77,23 +89,24 @@ public class DialogueState : MonoBehaviour
             playerController.transform.position = playerTpPoint.transform.position;
         }
         if (fearAI != null)
-        {
-            fearAI.transform.position = monsterTpPoint.transform.position;
-            fearAI.StartDying();
-        }
+            Destroy(fearAI.gameObject);
         if (rageAI != null)
+            Destroy(rageAI.gameObject);
+        if (fakeMonster != null)
         {
-            rageAI.transform.position = monsterTpPoint.transform.position;
-            rageAI.StartDying();
-        }
-        if (resentment != null)
-        {
-            resentment.transform.position = monsterTpPoint.transform.position;
-            resentment.StartDying();
+            fakeMonster.transform.position = monsterTpPoint.transform.position;
+            fakeMonster.StartDying();
+            PlaySound(deathClip);
         }
         if (ps != null)
         {
             ps.DeleteAll();
         }
+    }
+    
+    void PlaySound(AudioClip clip)
+    {
+        if (clip != null)
+            GetComponent<AudioSource>().PlayOneShot(clip);
     }
 }

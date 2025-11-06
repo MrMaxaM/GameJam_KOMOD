@@ -164,7 +164,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 5176225017332448064}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 0.2
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -192,19 +192,23 @@ MonoBehaviour:
   normalHearingRange: 4
   crouchHearingRange: 2
   wanderSpeed: 2.2
-  chaseSpeed: 3.5
+  chaseSpeed: 3.2
   waitTimeAtPoint: 3
   currentHearingRange: 0
   wanderArea: {fileID: 0}
   attackCooldown: 2
   chargeReadyTime: 0.5
-  chargeDistance: 3
-  chargeSpeed: 5
-  chargeDuration: 0.7
+  chargeDistance: 2.5
+  chargeSpeed: 4.5
+  chargeDuration: 0.6
   playerKnockbackForce: 12
   deathParticlesPrefab: {fileID: 995802282486592951, guid: d08cbeeab013bba42bb1105f5803a15b, type: 3}
   itemDropPrefab: {fileID: 2024121175974331009, guid: 6d425c196a64874479a876c9bb534ef1, type: 3}
   destructionEffect: {fileID: 0}
+  attackClip: {fileID: 8300000, guid: 01704ab5a4cf5d4419cab193dcc6c3c0, type: 3}
+  chaseClips:
+  - {fileID: 8300000, guid: 87c336ff273b69a40b823dbbffe31c1d, type: 3}
+  - {fileID: 8300000, guid: df78e586805456d41b16055aa0709887, type: 3}
 --- !u!95 &449166951538350308
 Animator:
   serializedVersion: 7

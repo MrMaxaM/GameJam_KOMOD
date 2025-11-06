@@ -9,6 +9,7 @@ public class ResentmentAI : MonoBehaviour
     public float returnToPuddleDistance = 10f;
     public float chaseSpeed = 3.5f;
     public BoxCollider2D wanderArea;
+    public GameObject spawnParticlesPrefab;
 
     [Header("Attack Settings")]
     public float attackCooldown = 1.5f;
@@ -28,8 +29,11 @@ public class ResentmentAI : MonoBehaviour
     private enum AIState { Idle, Chasing, Attacking, Returning, Searching }
     private Animator animator;
     private Vector2 move;
-
-
+    public AudioClip spawnClip;           // звук атаки
+    public AudioClip chaseClip;
+    public AudioClip attackClip; 
+   
+    private AudioSource audioSource;
 
     void Start()
     {
@@ -40,6 +44,13 @@ public class ResentmentAI : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player").transform;
         hideController = GameObject.FindGameObjectWithTag("Player").GetComponent<HideController>();
         animator = GetComponent<Animator>();
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
+        
+        Instantiate(spawnParticlesPrefab, transform.position, Quaternion.identity);
+        PlaySound(spawnClip);
     }
 
     void Update()
@@ -51,7 +62,7 @@ public class ResentmentAI : MonoBehaviour
         switch (currentState)
         {
             case AIState.Idle:
-                StartChasing();
+                Invoke(nameof(StartChasing),0.4f);
                 break;
             case AIState.Chasing:
                 UpdateChasing();
@@ -122,14 +133,6 @@ public class ResentmentAI : MonoBehaviour
             return;
         }
 
-        // Проверяем, не слишком ли далеко от лужи
-        float distanceToPuddle = Vector3.Distance(transform.position, puddlePosition);
-        if (distanceToPuddle > returnToPuddleDistance)
-        {
-            StartReturning();
-            return;
-        }
-
         if (attackTimer <= 0)
         {
             PerformAttack();
@@ -142,14 +145,6 @@ public class ResentmentAI : MonoBehaviour
         if (CanSeePlayer())
         {
             StartChasing();
-            return;
-        }
-
-        // Проверяем, не слишком ли далеко от лужи
-        float distanceToPuddle = Vector3.Distance(transform.position, puddlePosition);
-        if (distanceToPuddle > returnToPuddleDistance)
-        {
-            StartReturning();
             return;
         }
 
@@ -198,13 +193,14 @@ public class ResentmentAI : MonoBehaviour
     {
         currentState = AIState.Chasing;
         agent.isStopped = false;
+        PlaySound(chaseClip);
     }
 
     void StartAttacking()
     {
         currentState = AIState.Attacking;
         agent.isStopped = true;
-        attackTimer = 0;
+        PlaySound(attackClip);
     }
     
         void StartSearching()
@@ -248,36 +244,42 @@ public class ResentmentAI : MonoBehaviour
         homePuddle = puddle;
         puddlePosition = puddle.transform.position;
     }
-    
+
     void OnDrawGizmosSelected()
     {
         // Радиус обнаружения
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
-        
+
         // Радиус атаки
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
-        
+
         // Радиус возвращения к луже
         if (homePuddle != null)
         {
             Gizmos.color = Color.blue;
             Gizmos.DrawWireSphere(puddlePosition, returnToPuddleDistance);
         }
-        
+
         // Направление к игроку
         if (currentState == AIState.Chasing && player != null)
         {
             Gizmos.color = Color.green;
             Gizmos.DrawLine(transform.position, player.position);
         }
-        
+
         // Направление к луже
         if (currentState == AIState.Returning && homePuddle != null)
         {
             Gizmos.color = Color.cyan;
             Gizmos.DrawLine(transform.position, puddlePosition);
         }
+    }
+    
+    void PlaySound(AudioClip clip)
+    {
+        if (clip != null && !audioSource.isPlaying)
+            audioSource.PlayOneShot(clip);
     }
 }

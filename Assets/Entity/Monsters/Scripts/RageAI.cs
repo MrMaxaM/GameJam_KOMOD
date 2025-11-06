@@ -1,7 +1,6 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
-using System.Collections;
 using UnityEngine.Audio;
 
 
@@ -244,6 +243,8 @@ public class RageAI : MonoBehaviour
         chargeTimer = chargeDuration;
 
         agent.enabled = false;
+
+        PlaySound(attackClip);
         
         Debug.Log("ГНЕВ: Атакую!");
     }
@@ -309,7 +310,7 @@ public class RageAI : MonoBehaviour
         agent.isStopped = false;
         SetWanderDestination();
 
-        playlistManager.PlayPlaylist("RageCalm");
+        //playlistManager.PlayPlaylist("RageCalm");
         StopChaseSounds();
     }
 
@@ -320,7 +321,7 @@ public class RageAI : MonoBehaviour
         agent.isStopped = false;
         lastHeardPosition = player.position;
 
-        playlistManager.PlayPlaylist("RageChasing");
+        //playlistManager.PlayPlaylist("RageChasing");
         StartChaseSounds();
 
     }
@@ -330,72 +331,10 @@ public class RageAI : MonoBehaviour
         currentState = AIState.Searching;
         agent.SetDestination(lastHeardPosition);
         stateTimer = waitTimeAtPoint;
-        playlistManager.PlayPlaylist("RageSearching");
+        //playlistManager.PlayPlaylist("RageSearching");
 
         StopChaseSounds();
     }
-
-        public void StartDying()
-    {
-        Debug.Log($"СМЭРТЬ!");
-        currentState = AIState.Dying;
-        agent.isStopped = true;
-        StartCoroutine(DeathAnimation());
-    }
-
-    private IEnumerator DeathAnimation()
-    {
-        // Отключаем физику и коллайдер
-        if (monsterCollider != null)
-            monsterCollider.enabled = false;
-
-        if (rb != null)
-        {
-            rb.linearVelocity = Vector2.zero;
-            rb.bodyType = RigidbodyType2D.Kinematic; // Отключаем физическое воздействие
-        }
-        
-        yield return new WaitForSeconds(0.4f);
-
-        // Спавним партиклы смерти
-        if (deathParticlesPrefab != null)
-        {
-            GameObject particles = Instantiate(deathParticlesPrefab, transform.position, Quaternion.identity);
-        }
-
-        float currentSpeed = 0.1f;
-        float fadeTimer = 0f;
-        Color originalColor = spriteRenderer.color;
-        Vector3 originalPosition = transform.position;
-
-        // Анимация подъёма и исчезновения
-        while (fadeTimer < 4f)
-        {
-            // Поднимаем вверх с ускорением
-            currentSpeed += 0.1f * Time.deltaTime;
-            transform.position += Vector3.up * currentSpeed * Time.deltaTime;
-
-            // Плавное исчезновение
-            fadeTimer += Time.deltaTime;
-            float alpha = Mathf.Lerp(1f, 0f, fadeTimer / 4f);
-            spriteRenderer.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
-
-            yield return null;
-        }
-
-        // Спавним предмет на оригинальной позиции монстра
-        if (itemDropPrefab != null)
-        {
-            Instantiate(itemDropPrefab, originalPosition, Quaternion.identity);
-        }
-
-        // Ждём немного перед уничтожением
-        yield return new WaitForSeconds(1f);
-
-        // Уничтожаем монстра
-        Destroy(gameObject);
-    }
-
         public void StartDying()
     {
         Debug.Log($"СМЭРТЬ!");
@@ -486,6 +425,7 @@ public class RageAI : MonoBehaviour
 
     void StartChaseSounds()
     {
+        Debug.Log($"Старт звуков преследования");
         StopChaseSounds();
         if (chaseClips != null && chaseClips.Length > 0)
             chaseSoundRoutine = StartCoroutine(PlayRandomChaseSounds());
@@ -504,11 +444,12 @@ public class RageAI : MonoBehaviour
     {
         while (currentState == AIState.Chasing)
         {
-            float wait = Random.Range(3f, 8f);               // интервал между звуками
+            float wait = Random.Range(1f, 2.5f);               // интервал между звуками
             yield return new WaitForSeconds(wait);
 
             var clip = chaseClips[Random.Range(0, chaseClips.Length)];
             PlaySound(clip);
+            Debug.Log($"Кричу: {clip}");
         }
     }
 }

@@ -27,6 +27,9 @@ public class DialogueTrigger : MonoBehaviour
     [Header("Interaction Hint")]
     public GameObject interactionHintPrefab; // Префаб облачка с иконкой "E"
     public Vector3 hintOffset = new Vector3(0, 1.5f, 0); // Смещение над головой
+    [Header("Animation Settings")]
+    public float bounceAmount = 0.2f;
+    public float animationSpeed = 2f;
 
     private bool isInRange = false;
     private bool isDialogueActive = false;
@@ -37,6 +40,7 @@ public class DialogueTrigger : MonoBehaviour
     private GameObject currentBubble;
     private TextMeshProUGUI currentBubbleText;
     private GameObject currentHint; // Текущее отображаемое облачко
+    private Vector3 originalScale;
 
     public System.Action OnInteract;
     
@@ -47,12 +51,15 @@ public class DialogueTrigger : MonoBehaviour
     void Start()
     {
         playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
-        
+        originalScale = transform.localScale;
+
         // Подписываемся на изменение состояния
         if (DialogueState.Instance != null)
         {
             DialogueState.Instance.OnStateChanged += OnGameStateChanged;
         }
+        
+                StartCoroutine(Bounce());
     }
     
     void OnDestroy()
@@ -187,24 +194,40 @@ public class DialogueTrigger : MonoBehaviour
             displayCoroutine = StartCoroutine(HideLineAfterDelay());
         }
     }
-    
+
     IEnumerator TypewriterEffect(string text)
     {
         if (currentBubbleText == null) yield break;
-        
+
         // Очищаем текст и начинаем анимацию
         currentBubbleText.text = "";
-        
+
         // Печатаем по одному символу
         foreach (char c in text)
         {
             currentBubbleText.text += c;
             yield return new WaitForSeconds(typewriterSpeed);
         }
-        
+
         // После завершения печати ждём и переходим к следующей фразе
         yield return new WaitForSeconds(textDisplayTime);
         ShowNextLine();
+    }
+    
+    IEnumerator Bounce()
+    {
+        while (true)
+        {
+            // Плавно растягиваем вверх и возвращаем
+            float timer = 0f;
+            while (timer < 1f)
+            {
+                timer += Time.deltaTime * animationSpeed;
+                float bounce = Mathf.Sin(timer * Mathf.PI) * bounceAmount;
+                transform.localScale = originalScale + Vector3.up * bounce;
+                yield return null;
+            }
+        }
     }
     
     void CreateSpeechBubble(DialogueLine line)
