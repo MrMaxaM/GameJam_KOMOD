@@ -23,8 +23,14 @@ public class InventorySystem : MonoBehaviour
     [Header("Item Settings")]
     public LayerMask itemLayers = 1; // Слои для предметов
 
+    [Header("Audio Settings")]
+    public AudioClip pickupClip;
+    public AudioClip dropClip;
+    [Range(0f, 1f)] public float volume = 0.8f;
+
     public List<Item> inventory = new List<Item>();
     private PlayerController playerController;
+    private AudioSource audioSource;
     private GameObject currentBubble;
     private Item currentClosestItem;
     private TextMeshProUGUI currentBubbleText;
@@ -33,6 +39,7 @@ public class InventorySystem : MonoBehaviour
     void Start()
     {
         playerController = GetComponent<PlayerController>();
+        audioSource = GetComponent<AudioSource>();
         InitializeInventory();
     }
 
@@ -179,6 +186,7 @@ public class InventorySystem : MonoBehaviour
         {
             // Добавляем в инвентарь
             inventory[freeSlot] = item;
+            PlaySound(pickupClip);
             item.OnPickup(this);
 
             Debug.Log($"Подобран предмет: {item.itemName} в слот {freeSlot + 1}");
@@ -201,6 +209,7 @@ public class InventorySystem : MonoBehaviour
             Vector2 dropPosition = (Vector2)transform.position + Random.insideUnitCircle * 0.3f;
             item.OnDrop(dropPosition);
             inventory[slotIndex] = null;
+            PlaySound(dropClip);
 
             Debug.Log($"Выброшен предмет: {item.itemName} из слота {slotIndex + 1}");
         }
@@ -292,5 +301,11 @@ public class InventorySystem : MonoBehaviour
     {
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, pickupRadius);
+    }
+
+    void PlaySound(AudioClip clip)
+    {
+        if (clip != null)
+            audioSource.PlayOneShot(clip, volume);
     }
 }
