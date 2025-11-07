@@ -16,9 +16,33 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: -3658484677689930679, guid: 813a19c0dfade3748acd5d7e9db5b3e2, type: 3}
+    - target: {fileID: 1101981542346344758, guid: 8413244c0dedbde4a869f9449716e7c6, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5176625809270401437, guid: 8413244c0dedbde4a869f9449716e7c6, type: 3}
       propertyPath: m_Name
       value: "\u041C\u044F\u0447 Variant"
+      objectReference: {fileID: 0}
+    - target: {fileID: 6578135924446152658, guid: 8413244c0dedbde4a869f9449716e7c6, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 6200000, guid: 44c2e267ceaa0cb4a97fe89f45b421ee, type: 2}
+    - target: {fileID: 6578135924446152658, guid: 8413244c0dedbde4a869f9449716e7c6, type: 3}
+      propertyPath: m_LinearDamping
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6578135924446152658, guid: 8413244c0dedbde4a869f9449716e7c6, type: 3}
+      propertyPath: m_AngularDamping
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6578135924446152658, guid: 8413244c0dedbde4a869f9449716e7c6, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7013979044884424703, guid: 8413244c0dedbde4a869f9449716e7c6, type: 3}
+      propertyPath: m_Radius
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7237283603400747219, guid: 8413244c0dedbde4a869f9449716e7c6, type: 3}
       propertyPath: m_Pivot.x

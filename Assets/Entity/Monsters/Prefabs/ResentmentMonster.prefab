@@ -127,7 +127,7 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: -0.5}
-  m_Radius: 0.5
+  m_Radius: 1.6
 --- !u!50 &2126149958520592632
 Rigidbody2D:
   serializedVersion: 5
@@ -194,7 +194,7 @@ MonoBehaviour:
   returnToPuddleDistance: 8
   chaseSpeed: 3
   wanderArea: {fileID: 0}
-  spawnParticlesPrefab: {fileID: 2182809624648979585, guid: c82e6c757caeaeb4ca58284ae2ee9b97, type: 3}
+  spawnParticlesPrefab: {fileID: 2182809624648979585, guid: eee5667a2edaa6a478fa5dce9f49dd5e, type: 3}
   attackCooldown: 1.5
   attackTimer: 0
   currentState: 0

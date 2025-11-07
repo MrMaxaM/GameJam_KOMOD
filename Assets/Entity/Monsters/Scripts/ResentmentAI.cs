@@ -226,6 +226,13 @@ public class ResentmentAI : MonoBehaviour
         {
             playerHealth.TakeDamage();
         }
+
+        Vector2 knockbackDirection = (player.transform.position - transform.position).normalized;
+        Rigidbody2D playerRb = player.gameObject.GetComponent<Rigidbody2D>();
+        if (playerRb != null)
+        {
+            playerRb.AddForce(knockbackDirection * 5f, ForceMode2D.Impulse);
+        }
     }
     
     void DisappearIntoPuddle()

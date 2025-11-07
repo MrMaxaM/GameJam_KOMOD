@@ -29,17 +29,25 @@ public class PlaylistManager : MonoBehaviour
         if (playlists.Count > 0)
         {
             currentPlaylist = playlists[0];
-            player.PlayPlaylist(currentPlaylist.clips);
+            player.PlayPlaylist(currentPlaylist.clips, false);
         }
     }
 
-    public void PlayPlaylist(string playlistName)
+    public void PlayPlaylist(string playlistName, bool force = false)
     {
         var found = playlists.Find(p => p.name == playlistName);
+
+        Debug.Log($"Плейлисты: {playlists}");
         if (found != null)
         {
-            currentPlaylist = found;
-            player.PlayPlaylist(found.clips);
+            if (currentPlaylist != found)
+            {
+                Debug.Log($"Плейлист {found.name} найден");
+                currentPlaylist = found;
+                player.PlayPlaylist(found.clips, force);
+            }
+            else
+                Debug.LogWarning($"Плейлист '{playlistName}'уже играет.");
         }
         else
         {
@@ -50,5 +58,6 @@ public class PlaylistManager : MonoBehaviour
     public void Stop()
     {
         player.StopPlaylist();
+        currentPlaylist = null;
     }
 }

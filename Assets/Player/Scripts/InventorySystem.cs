@@ -97,24 +97,27 @@ public class InventorySystem : MonoBehaviour
                 Destroy(currentBubble);
             }
 
-            // Определяем позицию пузырька
-            Vector3 bubblePosition = closestItem.transform.position + new Vector3(0, 0.7f, 0);
-
-            // Создаём пузырёк
-            currentBubble = Instantiate(nameBubblePrefab, bubblePosition, Quaternion.identity);
-
-            // Находим текстовый компонент
-            currentBubbleText = currentBubble.GetComponentInChildren<TextMeshProUGUI>();
-            if (currentBubbleText != null)
+            if (currentClosestItem != null)
             {
-                currentBubbleText.text = closestItem.itemName;
+                // Определяем позицию пузырька
+                Vector3 bubblePosition = closestItem.transform.position + new Vector3(0, 0.7f, 0);
+
+                // Создаём пузырёк
+                currentBubble = Instantiate(nameBubblePrefab, bubblePosition, Quaternion.identity);
+
+                // Находим текстовый компонент
+                currentBubbleText = currentBubble.GetComponentInChildren<TextMeshProUGUI>();
+                if (currentBubbleText != null)
+                {
+                    currentBubbleText.text = closestItem.itemName;
+                }
+
+                if (typewriterCoroutine != null)
+                    StopCoroutine(typewriterCoroutine);
+
+                // Запускаем анимацию печати
+                typewriterCoroutine = StartCoroutine(TypewriterEffect(closestItem.itemName));
             }
-
-            if (typewriterCoroutine != null)
-                StopCoroutine(typewriterCoroutine);
-
-            // Запускаем анимацию печати
-            typewriterCoroutine = StartCoroutine(TypewriterEffect(closestItem.itemName));
         }
     }
 

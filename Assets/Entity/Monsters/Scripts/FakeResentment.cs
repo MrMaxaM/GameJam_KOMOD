@@ -4,6 +4,7 @@ using System.Collections;
 public class FakeResentment : MonoBehaviour
 {
     public GameObject deathParticlesPrefab;
+    public GameObject itemSpawnPerticlesPrefab;
     public GameObject itemDropPrefab;
     public GameObject monologPrefab;
     private SpriteRenderer spriteRenderer;
@@ -28,13 +29,14 @@ public class FakeResentment : MonoBehaviour
         // Спавним партиклы смерти
         if (deathParticlesPrefab != null)
         {
-            GameObject particles = Instantiate(deathParticlesPrefab, transform.position, Quaternion.identity);
+            GameObject particles = Instantiate(deathParticlesPrefab, transform.position, Quaternion.Euler(-90, 0, 0));
         }
 
         float currentSpeed = 0.1f;
         float fadeTimer = 0f;
         Color originalColor = spriteRenderer.color;
         Vector3 originalPosition = transform.position;
+        originalPosition.z = 0f;
 
         // Анимация подъёма и исчезновения
         while (fadeTimer < 4f)
@@ -55,7 +57,9 @@ public class FakeResentment : MonoBehaviour
         if (itemDropPrefab != null)
         {
             Instantiate(itemDropPrefab, originalPosition, Quaternion.identity);
-            Instantiate(monologPrefab, originalPosition, Quaternion.identity);
+            Instantiate(itemSpawnPerticlesPrefab, originalPosition, Quaternion.Euler(-90, 0, 0));
+            if (monologPrefab != null)
+                Instantiate(monologPrefab, originalPosition, Quaternion.identity);
         }
 
         // Ждём немного перед уничтожением

@@ -49,7 +49,7 @@ public class CutsceneSequence : MonoBehaviour
     void Update()
     {
         // Пропуск по клику
-        if (skipOnClick && Input.GetMouseButtonDown(0) && isPlaying)
+        if (skipOnClick && Input.anyKeyDown && isPlaying)
         {
             SkipToNextBlock();
         }

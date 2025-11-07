@@ -110,6 +110,6 @@ public class BackgroundMusic : MonoBehaviour
     // Автоматически останавливаем музыку при уничтожении объекта
     void OnDestroy()
     {
-        StopMusic();
+        audioSource.Stop();
     }
 }

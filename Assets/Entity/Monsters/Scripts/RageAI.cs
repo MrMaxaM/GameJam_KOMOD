@@ -70,7 +70,7 @@ public class RageAI : MonoBehaviour
         animator = GetComponent<Animator>();
         
         spriteRenderer = GetComponent<SpriteRenderer>();
-        playlistManager = FindFirstObjectByType<PlaylistManager>();
+        playlistManager = GetComponent<PlaylistManager>();
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
@@ -310,7 +310,8 @@ public class RageAI : MonoBehaviour
         agent.isStopped = false;
         SetWanderDestination();
 
-        playlistManager.PlayPlaylist("RageCalm");
+        if (DialogueState.Instance.currentPlace == "present")
+            playlistManager.PlayPlaylist("RageCalm");
         StopChaseSounds();
     }
 
@@ -321,7 +322,8 @@ public class RageAI : MonoBehaviour
         agent.isStopped = false;
         lastHeardPosition = player.position;
 
-        playlistManager.PlayPlaylist("RageChasing");
+        if (DialogueState.Instance.currentPlace == "present")
+            playlistManager.PlayPlaylist("RageChasing", true);
         StartChaseSounds();
 
     }
@@ -331,16 +333,25 @@ public class RageAI : MonoBehaviour
         currentState = AIState.Searching;
         agent.SetDestination(lastHeardPosition);
         stateTimer = waitTimeAtPoint;
-        playlistManager.PlayPlaylist("RageSearching");
+        if (DialogueState.Instance.currentPlace == "present")
+            playlistManager.PlayPlaylist("RageSearching");
 
         StopChaseSounds();
     }
-        public void StartDying()
+    public void StartDying()
     {
         Debug.Log($"СМЭРТЬ!");
         currentState = AIState.Dying;
         agent.isStopped = true;
         StartCoroutine(DeathAnimation());
+    }
+    
+    public void UpdateLocation(string newLocation)
+    {
+        if (playlistManager != null && newLocation == "past")
+            playlistManager.Stop();
+        else
+            playlistManager.PlayPlaylist("RageCalm", true);
     }
 
     private IEnumerator DeathAnimation()

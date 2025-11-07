@@ -29,11 +29,11 @@ public class SequentialAudioPlayer : MonoBehaviour
         }
     }
 
-    public void PlayPlaylist(AudioClip[] newClips)
+    public void PlayPlaylist(AudioClip[] newClips, bool force)
     {
         if (newClips == null || newClips.Length == 0) return;
 
-        if (isActive)
+        if (isActive && !force)
         {
             pendingClips = newClips; // переключим после текущего
         }

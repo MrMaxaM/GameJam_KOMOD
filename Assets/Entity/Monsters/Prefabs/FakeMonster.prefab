@@ -101,4 +101,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deathParticlesPrefab: {fileID: 995802282486592951, guid: d08cbeeab013bba42bb1105f5803a15b, type: 3}
+  itemSpawnPerticlesPrefab: {fileID: 2182809624648979585, guid: c82e6c757caeaeb4ca58284ae2ee9b97, type: 3}
   itemDropPrefab: {fileID: 2024121175974331009, guid: 6d425c196a64874479a876c9bb534ef1, type: 3}
+  monologPrefab: {fileID: 0}

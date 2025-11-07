@@ -18,7 +18,9 @@ public class DialogueState : MonoBehaviour
     public AudioClip deathClip;
     public AudioClip elevOpenClip;
     public AudioClip elevCloseClip;
+    public AudioSource pastMusic;
     public DialogueData activeMonologData;
+    public string currentPlace;
 
 
     // Событие при изменении состояния
@@ -27,8 +29,9 @@ public class DialogueState : MonoBehaviour
     
     void Start()
     {
-        
         PlaySound(elevCloseClip);
+        if (pastMusic != null)
+            pastMusic.Stop();
     }
 
     void Awake()
@@ -56,7 +59,6 @@ public class DialogueState : MonoBehaviour
         {
             Fade.Instance.FadeInOut(1f);
             Invoke(nameof(StartWin), 1f);
-            Destroy(GameObject.Find("NPC"));
         }
 
         if (newState == "end")
@@ -90,6 +92,19 @@ public class DialogueState : MonoBehaviour
         OnMonologUpdate?.Invoke();
     }
 
+    public void Teleport(string teleportTo)
+    {
+            currentPlace = teleportTo;
+            if (currentPlace == "past" && pastMusic != null)
+                pastMusic.Play();
+            if (currentPlace == "present" && pastMusic != null)
+                pastMusic.Stop();
+            if (fearAI != null)
+                fearAI.UpdateLocation(teleportTo);
+            if (rageAI != null)
+                rageAI.UpdateLocation(teleportTo);
+    }
+
     public void StartWin()
     {
         if (playerController != null)
@@ -102,6 +117,7 @@ public class DialogueState : MonoBehaviour
             Destroy(rageAI.gameObject);
         if (fakeMonster != null)
         {
+            Destroy(GameObject.Find("NPC"));
             fakeMonster.transform.position = monsterTpPoint.transform.position;
             fakeMonster.StartDying();
             PlaySound(deathClip);

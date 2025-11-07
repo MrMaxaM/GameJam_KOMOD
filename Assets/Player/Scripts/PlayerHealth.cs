@@ -55,6 +55,7 @@ public class PlayerHealth : MonoBehaviour
         if (respawnPoint != null)
         {
             transform.position = respawnPoint.position;
+            DialogueState.Instance.Teleport("present");
         }
         else
         {

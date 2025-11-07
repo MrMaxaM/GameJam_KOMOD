@@ -64,12 +64,14 @@ public class FearAI : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         monsterCollider = GetComponent<Collider2D>();
         animator = GetComponent<Animator>();
-        playlistManager = FindFirstObjectByType<PlaylistManager>();
+        playlistManager = GetComponent<PlaylistManager>();
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
 
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        Debug.Log("Тест1");
         
         if (spriteRenderer != null)
         {
@@ -270,7 +272,8 @@ public class FearAI : MonoBehaviour
         agent.isStopped = true;
         stateTimer = hidingTime;
         DarkenAppearance();
-        playlistManager.PlayPlaylist("FearWaiting");
+        if (DialogueState.Instance.currentPlace == "present")
+            playlistManager.PlayPlaylist("FearWaiting");
     }
     
     void StartWandering()
@@ -280,7 +283,8 @@ public class FearAI : MonoBehaviour
         agent.isStopped = false;
         ResetAppearance();
         SetWanderDestination();
-        playlistManager.PlayPlaylist("FearWandering");
+        if (DialogueState.Instance.currentPlace == "present")
+            playlistManager.PlayPlaylist("FearWandering");
     }
 
     void StartChasing()
@@ -290,7 +294,11 @@ public class FearAI : MonoBehaviour
         agent.speed = chaseSpeed;
         agent.isStopped = false;
         ResetAppearance();
-        playlistManager.PlayPlaylist("FearChasing");
+        
+        if (DialogueState.Instance.currentPlace == "present")
+        {
+            playlistManager.PlayPlaylist("FearChasing", true);
+        }
     }
 
     void StartAttacking()
@@ -298,9 +306,6 @@ public class FearAI : MonoBehaviour
         currentState = AIState.Attacking;
         agent.isStopped = true;
         ResetAppearance();
-
-        if (playlistManager != null)
-            playlistManager.PlayPlaylist("FearChasing");
     }
 
     void StartSearching()
@@ -340,6 +345,15 @@ public class FearAI : MonoBehaviour
         currentState = AIState.Dying;
         agent.isStopped = true;
         StartCoroutine(DeathAnimation());
+    }
+
+    public void UpdateLocation(string newLocation)
+    {
+        Debug.Log("Новая локация");
+        if (playlistManager != null && newLocation == "past")
+            playlistManager.Stop();
+        else
+            playlistManager.PlayPlaylist("FearWaiting", true);
     }
 
     private IEnumerator DeathAnimation()
@@ -401,6 +415,13 @@ public class FearAI : MonoBehaviour
         PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
         playerHealth.TakeDamage();
         Debug.Log($"Монстр атаковал игрока!");
+
+        Vector2 knockbackDirection = (player.transform.position - transform.position).normalized;
+        Rigidbody2D playerRb = player.gameObject.GetComponent<Rigidbody2D>();
+        if (playerRb != null)
+        {
+            playerRb.AddForce(knockbackDirection * 5f, ForceMode2D.Impulse);
+        }
     }
 
     void DarkenAppearance()

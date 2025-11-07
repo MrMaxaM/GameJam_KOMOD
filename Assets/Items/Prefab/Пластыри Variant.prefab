@@ -12,6 +12,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: "\u041F\u043B\u0430\u0441\u0442\u044B\u0440\u0438 Variant"
       objectReference: {fileID: 0}
+    - target: {fileID: 1550439591367299336, guid: da5cbd53d37dc1b4392bc081a567d861, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1550439591367299336, guid: da5cbd53d37dc1b4392bc081a567d861, type: 3}
+      propertyPath: m_LinearDamping
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1550439591367299336, guid: da5cbd53d37dc1b4392bc081a567d861, type: 3}
+      propertyPath: m_AngularDamping
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 1550439591367299336, guid: da5cbd53d37dc1b4392bc081a567d861, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 128
+      objectReference: {fileID: 0}
     - target: {fileID: 3071877480362737161, guid: da5cbd53d37dc1b4392bc081a567d861, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
