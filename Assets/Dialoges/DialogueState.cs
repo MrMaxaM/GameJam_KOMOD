@@ -18,12 +18,13 @@ public class DialogueState : MonoBehaviour
     public AudioClip deathClip;
     public AudioClip elevOpenClip;
     public AudioClip elevCloseClip;
-
-    private AudioSource audioSource;
+    public DialogueData activeMonologData;
 
 
     // Событие при изменении состояния
     public System.Action<string> OnStateChanged;
+    public System.Action OnMonologUpdate;
+    
     void Start()
     {
         
@@ -55,6 +56,7 @@ public class DialogueState : MonoBehaviour
         {
             Fade.Instance.FadeInOut(1f);
             Invoke(nameof(StartWin), 1f);
+            Destroy(GameObject.Find("NPC"));
         }
 
         if (newState == "end")
@@ -80,6 +82,12 @@ public class DialogueState : MonoBehaviour
         {
             SceneManager.LoadScene(sceneToLoad);
         }
+    }
+
+    public void SetActiveMonologData(DialogueData momolog)
+    {
+        activeMonologData = momolog;
+        OnMonologUpdate?.Invoke();
     }
 
     public void StartWin()

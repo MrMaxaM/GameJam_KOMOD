@@ -41,6 +41,7 @@ public class DialogueTrigger : MonoBehaviour
     private TextMeshProUGUI currentBubbleText;
     private GameObject currentHint; // Текущее отображаемое облачко
     private Vector3 originalScale;
+    private string stateToSet;
 
     public System.Action OnInteract;
     
@@ -59,7 +60,7 @@ public class DialogueTrigger : MonoBehaviour
             DialogueState.Instance.OnStateChanged += OnGameStateChanged;
         }
         
-                StartCoroutine(Bounce());
+        StartCoroutine(Bounce());
     }
     
     void OnDestroy()
@@ -105,6 +106,7 @@ public class DialogueTrigger : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.E) && isInRange && !isDialogueActive)
         {
             StartAppropriateDialogue();
+            DialogueState.Instance.SetActiveMonologData(null);
             OnInteract?.Invoke();
         }
         else if (Input.GetKeyDown(KeyCode.E) && isDialogueActive)
@@ -176,7 +178,7 @@ public class DialogueTrigger : MonoBehaviour
         // Устанавливаем состояние если указано
         if (!string.IsNullOrEmpty(line.setStateOnLine))
         {
-            DialogueState.Instance?.SetState(line.setStateOnLine);
+            stateToSet = line.setStateOnLine;
         }
 
         if (useTypewriterEffect)
@@ -334,6 +336,12 @@ public class DialogueTrigger : MonoBehaviour
     {
         Debug.Log($"Диалог завершен: {currentDialogue.dialogueName}");
         EndDialogue();
+
+        if (!string.IsNullOrEmpty(stateToSet))
+        {
+            DialogueState.Instance?.SetState(stateToSet);
+            stateToSet = null;
+        }
         
         if (isInRange)
         {

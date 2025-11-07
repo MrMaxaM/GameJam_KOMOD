@@ -5,6 +5,7 @@ public class FakeResentment : MonoBehaviour
 {
     public GameObject deathParticlesPrefab;
     public GameObject itemDropPrefab;
+    public GameObject monologPrefab;
     private SpriteRenderer spriteRenderer;
     private Rigidbody2D rb;
 
@@ -54,6 +55,7 @@ public class FakeResentment : MonoBehaviour
         if (itemDropPrefab != null)
         {
             Instantiate(itemDropPrefab, originalPosition, Quaternion.identity);
+            Instantiate(monologPrefab, originalPosition, Quaternion.identity);
         }
 
         // Ждём немного перед уничтожением

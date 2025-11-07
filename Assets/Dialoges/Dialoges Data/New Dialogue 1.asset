@@ -27,9 +27,6 @@ MonoBehaviour:
     setStateOnLine: 
   - text: "\u0424\u0443\u0445..."
     speaker: 0
-    setStateOnLine: 
-  - text: "\u0424\u0443\u0445..."
-    speaker: 0
     setStateOnLine: win
   requiredState: find2
   stateRequired: 1

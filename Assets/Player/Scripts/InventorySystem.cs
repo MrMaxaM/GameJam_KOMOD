@@ -1,6 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using Unity.VisualScripting;
 
 public class InventorySystem : MonoBehaviour
 {
@@ -11,16 +14,21 @@ public class InventorySystem : MonoBehaviour
 
     public KeyCode[] dropKeys = { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3 };
     public KeyCode dropAllKey = KeyCode.G;
-    
+
     [Header("UI References")]
     public Image[] slotImages; // 3 Image для слотов UI
     public Sprite emptySlotSprite;
-    
+    public GameObject nameBubblePrefab;
+
     [Header("Item Settings")]
     public LayerMask itemLayers = 1; // Слои для предметов
-    
+
     public List<Item> inventory = new List<Item>();
     private PlayerController playerController;
+    private GameObject currentBubble;
+    private Item currentClosestItem;
+    private TextMeshProUGUI currentBubbleText;
+    private Coroutine typewriterCoroutine;
 
     void Start()
     {
@@ -32,6 +40,7 @@ public class InventorySystem : MonoBehaviour
     {
         HandleInput();
         UpdateUI();
+        ShowNameOfItem();
     }
 
     void InitializeInventory()
@@ -50,7 +59,7 @@ public class InventorySystem : MonoBehaviour
         {
             TryPickupItem();
         }
-        
+
         // Выбрасывание предметов по цифрам
         for (int i = 0; i < dropKeys.Length && i < inventorySize; i++)
         {
@@ -59,7 +68,7 @@ public class InventorySystem : MonoBehaviour
                 DropItem(i);
             }
         }
-        
+
         // Выбрасывание всех предметов
         if (Input.GetKeyDown(dropAllKey))
         {
@@ -67,14 +76,63 @@ public class InventorySystem : MonoBehaviour
         }
     }
 
-    void TryPickupItem()
+    void ShowNameOfItem()
     {
-        // Ищем ближайший предмет в радиусе
+        Item closestItem = SearchClosestItem();
+
+        if (currentClosestItem != closestItem)
+        {
+            currentClosestItem = closestItem;
+
+            // Уничтожаем предыдущий пузырёк
+            if (currentBubble != null)
+            {
+                Destroy(currentBubble);
+            }
+
+            // Определяем позицию пузырька
+            Vector3 bubblePosition = closestItem.transform.position + new Vector3(0, 0.7f, 0);
+
+            // Создаём пузырёк
+            currentBubble = Instantiate(nameBubblePrefab, bubblePosition, Quaternion.identity);
+
+            // Находим текстовый компонент
+            currentBubbleText = currentBubble.GetComponentInChildren<TextMeshProUGUI>();
+            if (currentBubbleText != null)
+            {
+                currentBubbleText.text = closestItem.itemName;
+            }
+
+            if (typewriterCoroutine != null)
+                StopCoroutine(typewriterCoroutine);
+
+            // Запускаем анимацию печати
+            typewriterCoroutine = StartCoroutine(TypewriterEffect(closestItem.itemName));
+        }
+    }
+
+    IEnumerator TypewriterEffect(string text)
+    {
+        if (currentBubbleText == null) yield break;
+
+        // Очищаем текст и начинаем анимацию
+        currentBubbleText.text = "";
+
+        // Печатаем по одному символу
+        foreach (char c in text)
+        {
+            currentBubbleText.text += c;
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+
+    Item SearchClosestItem()
+    {
         Collider2D[] nearbyItems = Physics2D.OverlapCircleAll(transform.position, pickupRadius, itemLayers);
         
         Item closestItem = null;
         float closestDistance = Mathf.Infinity;
-        
+
         foreach (Collider2D collider in nearbyItems)
         {
             Item item = collider.GetComponent<Item>();
@@ -88,6 +146,14 @@ public class InventorySystem : MonoBehaviour
                 }
             }
         }
+
+        return closestItem;
+    }
+
+    void TryPickupItem()
+    {
+        // Ищем ближайший предмет в радиусе
+        Item closestItem = SearchClosestItem();
         
         // Подбираем ближайший предмет
         if (closestItem != null)

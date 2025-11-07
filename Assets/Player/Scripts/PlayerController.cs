@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour
     public float stepInterval = 0.4f;   // задержка между шагами
     public float volume = 0.6f;
 
+    public bool isMonologActive;
+
     private float stepTimer;
     private AudioSource audioSource;
     private Vector2 smoothVelocity;
