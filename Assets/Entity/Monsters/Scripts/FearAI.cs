@@ -34,6 +34,10 @@ public class FearAI : MonoBehaviour
     [SerializeField] private float dashTimer;
     [SerializeField] private Vector3 dashTarget;
 
+    [Header("Audio Settings")]
+    public AudioClip attackClip;
+    private AudioSource audioSource;
+
     private NavMeshAgent agent;
     private Transform player;
     private HideController hideController;
@@ -46,12 +50,7 @@ public class FearAI : MonoBehaviour
     private Animator animator;
     private Vector2 move;
 
-    private PlaylistManager playlistManager;
-
-    public AudioClip attackClip;           // звук атаки
-
-    private AudioSource audioSource;
-
+    private AdaptiveMusicManager musicManager;
 
     void Start()
     {
@@ -59,17 +58,22 @@ public class FearAI : MonoBehaviour
         agent.updateRotation = false;
         agent.updateUpAxis = false;
         agent.speed = wanderSpeed;
+
         player = GameObject.FindGameObjectWithTag("Player").transform;
-        hideController = GameObject.FindGameObjectWithTag("Player").GetComponent<HideController>();
+        hideController = player.GetComponent<HideController>();
         rb = GetComponent<Rigidbody2D>();
         monsterCollider = GetComponent<Collider2D>();
         animator = GetComponent<Animator>();
-        playlistManager = GetComponent<PlaylistManager>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+
+        musicManager = FindFirstObjectByType<AdaptiveMusicManager>(); // ищем глобальный менеджер музыки
+
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
 
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null)
+            originalColor = spriteRenderer.color;
 
         Debug.Log("Тест1");
         
@@ -272,8 +276,8 @@ public class FearAI : MonoBehaviour
         agent.isStopped = true;
         stateTimer = hidingTime;
         DarkenAppearance();
-        if (DialogueState.Instance.currentPlace == "present")
-            playlistManager.PlayPlaylist("FearWaiting");
+        if (musicManager != null)
+            musicManager.SetState(AdaptiveMusicManager.MonsterState.Calm);
     }
     
     void StartWandering()
@@ -283,8 +287,8 @@ public class FearAI : MonoBehaviour
         agent.isStopped = false;
         ResetAppearance();
         SetWanderDestination();
-        if (DialogueState.Instance.currentPlace == "present")
-            playlistManager.PlayPlaylist("FearWandering");
+        if (musicManager != null)
+            musicManager.SetState(AdaptiveMusicManager.MonsterState.Calm);
     }
 
     void StartChasing()
@@ -294,11 +298,9 @@ public class FearAI : MonoBehaviour
         agent.speed = chaseSpeed;
         agent.isStopped = false;
         ResetAppearance();
-        
-        if (DialogueState.Instance.currentPlace == "present")
-        {
-            playlistManager.PlayPlaylist("FearChasing", true);
-        }
+
+        if (musicManager != null)
+            musicManager.SetState(AdaptiveMusicManager.MonsterState.Chase);
     }
 
     void StartAttacking()
@@ -306,6 +308,8 @@ public class FearAI : MonoBehaviour
         currentState = AIState.Attacking;
         agent.isStopped = true;
         ResetAppearance();
+        if (musicManager != null)
+            musicManager.SetState(AdaptiveMusicManager.MonsterState.Chase);
     }
 
     void StartSearching()
@@ -315,6 +319,8 @@ public class FearAI : MonoBehaviour
         stateTimer = sightWaitTime;
         agent.isStopped = false;
         ResetAppearance();
+        if (musicManager != null)
+            musicManager.SetState(AdaptiveMusicManager.MonsterState.Search);
     }
 
     void StartDashing()
@@ -337,6 +343,8 @@ public class FearAI : MonoBehaviour
 
         dashTimer = dashDuration;
         ResetAppearance();
+        if (musicManager != null)
+            musicManager.SetState(AdaptiveMusicManager.MonsterState.Chase);
     }
 
     public void StartDying()
@@ -349,11 +357,11 @@ public class FearAI : MonoBehaviour
 
     public void UpdateLocation(string newLocation)
     {
-        Debug.Log("Новая локация");
-        if (playlistManager != null && newLocation == "past")
-            playlistManager.Stop();
-        else
-            playlistManager.PlayPlaylist("FearWaiting", true);
+        //Debug.Log("Новая локация");
+        //if (playlistManager != null && newLocation == "past")
+        //    playlistManager.Stop();
+        //else
+        //    playlistManager.PlayPlaylist("FearWaiting", true);
     }
 
     private IEnumerator DeathAnimation()
