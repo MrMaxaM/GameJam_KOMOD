@@ -42,19 +42,46 @@ public class AdaptiveMusicManager : MonoBehaviour
     {
         float step = fadeSpeed * Time.deltaTime;
 
+        // Целевые громкости
         float calmTarget = currentState == MonsterState.Calm ? targetVolume : 0f;
         float chaseTarget = currentState == MonsterState.Chase ? targetVolume : 0f;
         float searchTarget = currentState == MonsterState.Search ? targetVolume : 0f;
 
-        calmMusic.volume = Mathf.MoveTowards(calmMusic.volume, calmTarget, step);
-        chaseMusic.volume = Mathf.MoveTowards(chaseMusic.volume, chaseTarget, step);
-        searchMusic.volume = Mathf.MoveTowards(searchMusic.volume, searchTarget, step);
+        // Если включен режим погони — делаем мгновенный переход
+        if (currentState == MonsterState.Chase)
+        {
+            chaseMusic.volume = targetVolume; // сразу громко
+            calmMusic.volume = Mathf.MoveTowards(calmMusic.volume, 0f, step); // остальные затихают
+            searchMusic.volume = Mathf.MoveTowards(searchMusic.volume, 0f, step);
+        }
+        else
+        {
+            // В обычных случаях всё плавно
+            calmMusic.volume = Mathf.MoveTowards(calmMusic.volume, calmTarget, step);
+            chaseMusic.volume = Mathf.MoveTowards(chaseMusic.volume, chaseTarget, step * 2f); // чуть быстрее затухает после погони
+            searchMusic.volume = Mathf.MoveTowards(searchMusic.volume, searchTarget, step);
+        }
     }
+
 
     public void SetState(MonsterState newState)
     {
         if (currentState == newState) return;
         currentState = newState;
+    }
+
+    public void Stop()
+    {
+        calmMusic.Stop();
+        chaseMusic.Stop();
+        searchMusic.Stop();
+    }
+
+    public void Play()
+    {
+        calmMusic.Play();
+        chaseMusic.Play();
+        searchMusic.Play();
     }
 
     // Пример вызова: из кода монстра

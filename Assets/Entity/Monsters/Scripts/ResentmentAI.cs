@@ -20,6 +20,12 @@ public class ResentmentAI : MonoBehaviour
     [SerializeField] private float stateTimer;
     [SerializeField] private Vector3 lastKnownPlayerPosition;
 
+    [Header("Audio Settings")]
+    public AudioClip spawnClip;
+    public AudioClip chaseClip;
+    public AudioClip attackClip;
+    private AudioSource audioSource;
+
     private NavMeshAgent agent;
     private Transform player;
     
@@ -29,11 +35,6 @@ public class ResentmentAI : MonoBehaviour
     private enum AIState { Idle, Chasing, Attacking, Returning, Searching }
     private Animator animator;
     private Vector2 move;
-    public AudioClip spawnClip;           // звук атаки
-    public AudioClip chaseClip;
-    public AudioClip attackClip; 
-   
-    private AudioSource audioSource;
 
     void Start()
     {

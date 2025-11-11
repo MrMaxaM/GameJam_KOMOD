@@ -75,7 +75,7 @@ public class FearAI : MonoBehaviour
         if (spriteRenderer != null)
             originalColor = spriteRenderer.color;
 
-        Debug.Log("Тест1");
+        // Debug.Log("Тест1");
         
         if (spriteRenderer != null)
         {
@@ -357,11 +357,12 @@ public class FearAI : MonoBehaviour
 
     public void UpdateLocation(string newLocation)
     {
-        //Debug.Log("Новая локация");
-        //if (playlistManager != null && newLocation == "past")
-        //    playlistManager.Stop();
-        //else
-        //    playlistManager.PlayPlaylist("FearWaiting", true);
+        Debug.Log("Новая локация");
+        if (musicManager != null && newLocation == "past")
+            musicManager.Stop();
+        else
+            musicManager.Play();
+            musicManager.SetState(AdaptiveMusicManager.MonsterState.Calm);
     }
 
     private IEnumerator DeathAnimation()

@@ -103,6 +103,8 @@ public class DialogueState : MonoBehaviour
                 fearAI.UpdateLocation(teleportTo);
             if (rageAI != null)
                 rageAI.UpdateLocation(teleportTo);
+            if (ps != null)
+                ps.UpdateLocation(teleportTo);
     }
 
     public void StartWin()
