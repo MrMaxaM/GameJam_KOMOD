@@ -36,7 +36,12 @@ public class RageAI : MonoBehaviour
     private Vector3 lastHeardPosition;
     private float stateTimer;
     private float attackTimer;
-    
+
+    [Header("Audio Settings")]
+    public AudioClip attackClip;           // звук атаки
+    public AudioClip[] chaseClips;         // набор звуков для преследования
+    private AudioSource audioSource;
+
     private enum AIState { Wandering, Chasing, PreparingCharge, Charging, Searching, Dying }
     private AIState currentState = AIState.Wandering;
     
@@ -48,13 +53,9 @@ public class RageAI : MonoBehaviour
     private Animator animator;
     private Vector2 move;
 
-    private PlaylistManager playlistManager;
-
-    public AudioClip attackClip;           // звук атаки
-    public AudioClip[] chaseClips;         // набор звуков для преследования
-
-    private AudioSource audioSource;
     private Coroutine chaseSoundRoutine;
+
+    private AdaptiveMusicManager musicManager;
 
     void Start()
     {
@@ -70,7 +71,9 @@ public class RageAI : MonoBehaviour
         animator = GetComponent<Animator>();
         
         spriteRenderer = GetComponent<SpriteRenderer>();
-        playlistManager = GetComponent<PlaylistManager>();
+
+        musicManager = FindFirstObjectByType<AdaptiveMusicManager>();
+
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
@@ -310,8 +313,8 @@ public class RageAI : MonoBehaviour
         agent.isStopped = false;
         SetWanderDestination();
 
-        if (DialogueState.Instance.currentPlace == "present")
-            playlistManager.PlayPlaylist("RageCalm");
+        if (musicManager != null)
+            musicManager.SetState(AdaptiveMusicManager.MonsterState.Calm);
         StopChaseSounds();
     }
 
@@ -322,8 +325,8 @@ public class RageAI : MonoBehaviour
         agent.isStopped = false;
         lastHeardPosition = player.position;
 
-        if (DialogueState.Instance.currentPlace == "present")
-            playlistManager.PlayPlaylist("RageChasing", true);
+        if (musicManager != null)
+            musicManager.SetState(AdaptiveMusicManager.MonsterState.Chase);
         StartChaseSounds();
 
     }
@@ -333,8 +336,8 @@ public class RageAI : MonoBehaviour
         currentState = AIState.Searching;
         agent.SetDestination(lastHeardPosition);
         stateTimer = waitTimeAtPoint;
-        if (DialogueState.Instance.currentPlace == "present")
-            playlistManager.PlayPlaylist("RageSearching");
+        if (musicManager != null)
+            musicManager.SetState(AdaptiveMusicManager.MonsterState.Search);
 
         StopChaseSounds();
     }
@@ -345,13 +348,15 @@ public class RageAI : MonoBehaviour
         agent.isStopped = true;
         StartCoroutine(DeathAnimation());
     }
-    
+
     public void UpdateLocation(string newLocation)
     {
-        if (playlistManager != null && newLocation == "past")
-            playlistManager.Stop();
+        Debug.Log("Новая локация");
+        if (musicManager != null && newLocation == "past")
+            musicManager.Stop();
         else
-            playlistManager.PlayPlaylist("RageCalm", true);
+            musicManager.Play();
+        musicManager.SetState(AdaptiveMusicManager.MonsterState.Calm);
     }
 
     private IEnumerator DeathAnimation()

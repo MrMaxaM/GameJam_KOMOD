@@ -16,7 +16,14 @@ public class PuddleSpawner : MonoBehaviour
     private int currentPuddleCount = 0;
     private bool monsterSpawned = false;
     private List<PuddleController> activePuddles = new List<PuddleController>();
-    
+
+    private AdaptiveMusicManager musicManager;
+
+    private void Start()
+    {
+        musicManager = FindFirstObjectByType<AdaptiveMusicManager>();
+    }
+
     void Update()
     {
         if (currentPuddleCount < maxPuddles)
@@ -53,11 +60,15 @@ public class PuddleSpawner : MonoBehaviour
     public void OnMonsterSpawned()
     {
         monsterSpawned = true;
+        if (musicManager != null)
+            musicManager.SetState(AdaptiveMusicManager.MonsterState.Chase);
     }
     
     public void OnMonsterReturned()
     {
         monsterSpawned = false;
+        if (musicManager != null)
+            musicManager.SetState(AdaptiveMusicManager.MonsterState.Calm);
     }
     
     public void OnPuddleDestroyed(PuddleController puddle)
@@ -92,5 +103,15 @@ public class PuddleSpawner : MonoBehaviour
             currentPuddleCount = 0;
             maxPuddles = 0;
         }
+    }
+
+    public void UpdateLocation(string newLocation)
+    {
+        Debug.Log("Новая локация");
+        if (musicManager != null && newLocation == "past")
+            musicManager.Stop();
+        else
+            musicManager.Play();
+            musicManager.SetState(AdaptiveMusicManager.MonsterState.Calm);
     }
 }
