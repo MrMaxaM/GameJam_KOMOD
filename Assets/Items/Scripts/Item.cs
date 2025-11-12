@@ -34,8 +34,8 @@ public class Item : MonoBehaviour
 
         if(itemName == "Кнопка")
         {
-            PulseEffect circle = FindFirstObjectByType<PulseEffect>();
-            circle.StartFadeOut();
+            // PulseEffect circle = FindFirstObjectByType<PulseEffect>();
+            // circle.StartFadeOut();
         }
     }
 
