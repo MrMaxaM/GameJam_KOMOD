@@ -194,7 +194,7 @@ MonoBehaviour:
   waitTimeAtPoint: 2
   sightWaitTime: 3
   wanderSpeed: 1.5
-  chaseSpeed: 3
+  chaseSpeed: 2.9
   wanderPoints:
   - {fileID: 0}
   - {fileID: 0}

@@ -6,6 +6,7 @@ public class EscapeMenu : MonoBehaviour
 {
     [Header("UI References")]
     public GameObject menuPanel;          // Панель всего меню
+    public GameObject gamePanel;          // Панель игрового UI
     public Button continueButton;         // Кнопка "Продолжить"
     public Button mainMenuButton;         // Кнопка "Выйти в главное меню"
 
@@ -52,6 +53,7 @@ public class EscapeMenu : MonoBehaviour
         if (menuPanel != null)
         {
             menuPanel.SetActive(isMenuActive);
+            gamePanel.SetActive(!isMenuActive);
         }
 
         // Останавливаем или возобновляем время
@@ -69,6 +71,7 @@ public class EscapeMenu : MonoBehaviour
         if (menuPanel != null)
         {
             menuPanel.SetActive(false);
+            gamePanel.SetActive(true);
         }
 
         // Возобновляем время
@@ -84,7 +87,7 @@ public class EscapeMenu : MonoBehaviour
         // Восстанавливаем нормальную скорость времени перед загрузкой сцены
         Time.timeScale = 1f;
 
-        // Загружаем главное меню (замените "MainMenu" на имя вашей сцены)
+        // Загружаем главное меню
         SceneManager.LoadScene("Menu");
     }
 

@@ -117,8 +117,8 @@ public class Fade : MonoBehaviour
         // Прозрачное → Чёрное
         yield return FadeRoutine(0f, 1f);
         
-        // Можно добавить задержку между фазами
-        // yield return new WaitForSeconds(0.5f);
+        // Задержка между фазами
+        yield return new WaitForSeconds(0.2f);
         
         // Чёрное → Прозрачное
         yield return FadeRoutine(1f, 0f);

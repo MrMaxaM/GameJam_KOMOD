@@ -192,7 +192,7 @@ MonoBehaviour:
   detectionRange: 4
   attackRange: 1
   returnToPuddleDistance: 8
-  chaseSpeed: 3
+  chaseSpeed: 2.9
   wanderArea: {fileID: 0}
   spawnParticlesPrefab: {fileID: 2182809624648979585, guid: eee5667a2edaa6a478fa5dce9f49dd5e, type: 3}
   attackCooldown: 1.5

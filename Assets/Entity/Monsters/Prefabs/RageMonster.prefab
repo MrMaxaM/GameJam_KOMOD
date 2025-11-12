@@ -192,7 +192,7 @@ MonoBehaviour:
   normalHearingRange: 4
   crouchHearingRange: 2
   wanderSpeed: 2.2
-  chaseSpeed: 3.2
+  chaseSpeed: 3
   waitTimeAtPoint: 3
   currentHearingRange: 0
   wanderArea: {fileID: 0}
