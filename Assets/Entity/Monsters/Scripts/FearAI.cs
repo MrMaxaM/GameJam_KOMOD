@@ -51,9 +51,12 @@ public class FearAI : MonoBehaviour
     private Vector2 move;
 
     private AdaptiveMusicManager musicManager;
+    private CameraFollow cameraEffects;
+    private float distanceToPlayer;
 
     void Start()
     {
+        cameraEffects = Camera.main.GetComponent<CameraFollow>();
         agent = GetComponent<NavMeshAgent>();
         agent.updateRotation = false;
         agent.updateUpAxis = false;
@@ -169,7 +172,7 @@ public class FearAI : MonoBehaviour
             return;
         }
         
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        distanceToPlayer = Vector3.Distance(transform.position, player.position);
         if (distanceToPlayer <= attackRange)
         {
             StartAttacking();
@@ -178,27 +181,34 @@ public class FearAI : MonoBehaviour
         
         agent.SetDestination(player.position);
         lastKnownPlayerPosition = player.position;
+
+        cameraEffects.UpdateThreatEffect(distanceToPlayer, true);
     }
 
     void UpdateAttacking()
     {
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        distanceToPlayer = Vector3.Distance(transform.position, player.position);
         Debug.Log($"{distanceToPlayer}, {attackRange}");
         if (distanceToPlayer > attackRange)
         {
             StartChasing();
             return;
         }
-        
+
         if (attackTimer <= 0)
         {
             PerformAttack();
             attackTimer = attackCooldown;
         }
+        
+        cameraEffects.UpdateThreatEffect(distanceToPlayer, true);
     }
 
     void UpdateSearching()
     {
+        distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        cameraEffects.UpdateThreatEffect(distanceToPlayer, true);
+
         if (CanSeePlayer())
         {
             StartChasing();
@@ -206,12 +216,15 @@ public class FearAI : MonoBehaviour
         }
 
         if (stateTimer > 0) return;
-        
+
         StartWandering();
+    
     }
 
     void UpdateDashing()
     {
+        distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
         if (dashTimer <= 0)
         {
             StartChasing();
@@ -220,16 +233,18 @@ public class FearAI : MonoBehaviour
         
         float dashProgress = 1f - (dashTimer / dashDuration);
         transform.position = Vector3.Lerp(transform.position, dashTarget, dashProgress);
-        
+
         if (Vector3.Distance(transform.position, player.position) <= attackRange)
         {
             StartAttacking();
         }
+        
+        cameraEffects.UpdateThreatEffect(distanceToPlayer, true);
     }
 
     bool CanSeePlayer()
     {
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        distanceToPlayer = Vector3.Distance(transform.position, player.position);
         if (distanceToPlayer > detectionRange || hideController.isHiding) return false;
         
         RaycastHit2D hit = Physics2D.Raycast(
@@ -289,6 +304,8 @@ public class FearAI : MonoBehaviour
         SetWanderDestination();
         if (musicManager != null)
             musicManager.SetState(AdaptiveMusicManager.MonsterState.Calm);
+
+        cameraEffects.UpdateThreatEffect(distanceToPlayer, false);
     }
 
     void StartChasing()
@@ -347,14 +364,6 @@ public class FearAI : MonoBehaviour
             musicManager.SetState(AdaptiveMusicManager.MonsterState.Chase);
     }
 
-    public void StartDying()
-    {
-        Debug.Log($"СМЭРТЬ!");
-        currentState = AIState.Dying;
-        agent.isStopped = true;
-        StartCoroutine(DeathAnimation());
-    }
-
     public void UpdateLocation(string newLocation)
     {
         Debug.Log("Новая локация");
@@ -363,59 +372,6 @@ public class FearAI : MonoBehaviour
         else
             musicManager.Play();
             musicManager.SetState(AdaptiveMusicManager.MonsterState.Calm);
-    }
-
-    private IEnumerator DeathAnimation()
-    {
-        // Отключаем физику и коллайдер
-        if (monsterCollider != null)
-            monsterCollider.enabled = false;
-
-        if (rb != null)
-        {
-            rb.linearVelocity = Vector2.zero;
-            rb.bodyType = RigidbodyType2D.Kinematic; // Отключаем физическое воздействие
-        }
-        
-        yield return new WaitForSeconds(0.4f);
-
-        // Спавним партиклы смерти
-        if (deathParticlesPrefab != null)
-        {
-            GameObject particles = Instantiate(deathParticlesPrefab, transform.position, Quaternion.identity);
-        }
-
-        float currentSpeed = 0.1f;
-        float fadeTimer = 0f;
-        Color originalColor = spriteRenderer.color;
-        Vector3 originalPosition = transform.position;
-
-        // Анимация подъёма и исчезновения
-        while (fadeTimer < 4f)
-        {
-            // Поднимаем вверх с ускорением
-            currentSpeed += 0.1f * Time.deltaTime;
-            transform.position += Vector3.up * currentSpeed * Time.deltaTime;
-
-            // Плавное исчезновение
-            fadeTimer += Time.deltaTime;
-            float alpha = Mathf.Lerp(1f, 0f, fadeTimer / 4f);
-            spriteRenderer.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
-
-            yield return null;
-        }
-
-        // Спавним предмет на оригинальной позиции монстра
-        if (itemDropPrefab != null)
-        {
-            Instantiate(itemDropPrefab, originalPosition, Quaternion.identity);
-        }
-
-        // Ждём немного перед уничтожением
-        yield return new WaitForSeconds(1f);
-
-        // Уничтожаем монстра
-        Destroy(gameObject);
     }
 
     void PerformAttack()

@@ -52,13 +52,14 @@ public class RageAI : MonoBehaviour
     private Rigidbody2D rb;
     private Animator animator;
     private Vector2 move;
-
     private Coroutine chaseSoundRoutine;
-
     private AdaptiveMusicManager musicManager;
+    private CameraFollow cameraEffects;
+    private float distanceToPlayer;
 
     void Start()
     {
+        cameraEffects = Camera.main.GetComponent<CameraFollow>();
         agent = GetComponent<NavMeshAgent>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         playerController = player.GetComponent<PlayerController>();
@@ -169,28 +170,35 @@ public class RageAI : MonoBehaviour
         lastHeardPosition = player.position;
         agent.SetDestination(player.position);
 
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        distanceToPlayer = Vector3.Distance(transform.position, player.position);
         if (distanceToPlayer <= chargeDistance && attackTimer <= 0)
         {
             StartPreparingCharge();
         }
+
+        cameraEffects.UpdateThreatEffect(distanceToPlayer, true);
     }
     
     void UpdatePreparingCharge()
     {
         agent.isStopped = true;
-        
+
         if (stateTimer <= 0)
         {
             StartCharging();
         }
+        
+        cameraEffects.UpdateThreatEffect(distanceToPlayer, true);
     }
 
     void UpdateCharging()
     {
         if (currentState != AIState.Charging) return;
         transform.position += chargeDirection * chargeSpeed * Time.deltaTime;
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
+        cameraEffects.UpdateThreatEffect(distanceToPlayer, true);
+        
         if (distanceToPlayer <= 1f)
         {
             PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
@@ -198,7 +206,7 @@ public class RageAI : MonoBehaviour
             {
                 playerHealth.TakeDamage();
             }
-            
+
             // Отталкиваем игрока
             Vector2 knockbackDirection = (player.transform.position - transform.position).normalized;
             Rigidbody2D playerRb = player.gameObject.GetComponent<Rigidbody2D>();
@@ -212,20 +220,25 @@ public class RageAI : MonoBehaviour
 
     void UpdateSearching()
     {
-        if (stateTimer > 0) return;
+        if (stateTimer > 0)
+        {
+            distanceToPlayer = Vector3.Distance(transform.position, player.position);
+            cameraEffects.UpdateThreatEffect(distanceToPlayer, true);
+            return;
+        }
         
         if (CanHearPlayer())
         {
             StartChasing();
             return;
         }
-        
+
         StartWandering();
     }
 
     bool CanHearPlayer()
     {
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        distanceToPlayer = Vector3.Distance(transform.position, player.position);
         return distanceToPlayer <= currentHearingRange & !hideController.isHiding;
     }
 
@@ -316,6 +329,8 @@ public class RageAI : MonoBehaviour
         if (musicManager != null)
             musicManager.SetState(AdaptiveMusicManager.MonsterState.Calm);
         StopChaseSounds();
+
+        cameraEffects.UpdateThreatEffect(distanceToPlayer, false);
     }
 
     void StartChasing()

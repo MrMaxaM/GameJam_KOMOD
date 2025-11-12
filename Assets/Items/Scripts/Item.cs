@@ -31,6 +31,12 @@ public class Item : MonoBehaviour
         // Делаем дочерним объектом (опционально)
         transform.SetParent(collector.transform);
         transform.localPosition = Vector3.zero;
+
+        if(itemName == "Кнопка")
+        {
+            PulseEffect circle = FindFirstObjectByType<PulseEffect>();
+            circle.StartFadeOut();
+        }
     }
 
     public void OnDrop(Vector2 dropPosition)

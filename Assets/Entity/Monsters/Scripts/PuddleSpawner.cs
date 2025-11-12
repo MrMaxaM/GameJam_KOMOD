@@ -3,12 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.AI;
 using Unity.VisualScripting;
+using System;
 
 public class PuddleSpawner : MonoBehaviour
 {
     [Header("Spawn Settings")]
     public GameObject puddlePrefab;
-    public BoxCollider2D spawnArea;
+    public Collider2D spawnArea;
+    public Collider2D walkableArea;
     public float spawnInterval = 15f;
     public int maxPuddles = 5;
     
@@ -79,10 +81,13 @@ public class PuddleSpawner : MonoBehaviour
 
     Vector3 GetRandomSpawnPosition()
     {
-        Bounds bounds = spawnArea.bounds;
+        float minX = Math.Max(spawnArea.bounds.min.x, walkableArea.bounds.min.x);
+        float maxX = Math.Min(spawnArea.bounds.max.x, walkableArea.bounds.max.x);
+        float minY = Math.Max(spawnArea.bounds.min.y, walkableArea.bounds.min.y);
+        float maxY = Math.Min(spawnArea.bounds.max.y, walkableArea.bounds.max.y);
 
-        float randomX = Random.Range(bounds.min.x, bounds.max.x);
-        float randomY = Random.Range(bounds.min.y, bounds.max.y);
+        float randomX = UnityEngine.Random.Range(minX, maxX);
+        float randomY = UnityEngine.Random.Range(minY, maxY);
 
         Vector3 randomPoint = new Vector3(randomX, randomY, 0);
 

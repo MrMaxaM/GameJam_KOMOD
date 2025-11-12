@@ -59,13 +59,13 @@ public class Fade : MonoBehaviour
     // Из чёрного в прозрачный (появление)
     public void FadeFromBlack()
     {
-        StartFade(1f, 0f);
+        StartFade(canvasGroup.alpha, 0f);
     }
 
     // Из прозрачного в чёрный (исчезновение)
     public void FadeToBlack()
     {
-        StartFade(0f, 1f);
+        StartFade(canvasGroup.alpha, 1f);
     }
 
     // Полный переход: прозрачное → чёрное → прозрачное

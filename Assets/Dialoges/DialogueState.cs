@@ -27,7 +27,6 @@ public class DialogueState : MonoBehaviour
     public System.Action<string> OnStateChanged;
     public System.Action OnMonologUpdate;
     public System.Action<string> OnTeleport;
-    public System.Action<string> OnTeleport;
     
     void Start()
     {
@@ -104,15 +103,11 @@ public class DialogueState : MonoBehaviour
             if (fearAI != null)
                 fearAI.UpdateLocation(teleportTo);
             if (rageAI != null)
-<<<<<<< HEAD
                 rageAI.UpdateLocation(teleportTo);
             if (ps != null)
                 ps.UpdateLocation(teleportTo);
-=======
-            rageAI.UpdateLocation(teleportTo);
+            OnTeleport.Invoke(currentPlace);
                 
-            OnTeleport?.Invoke(currentPlace);
->>>>>>> origin/main
     }
 
     public void StartWin()
@@ -127,7 +122,10 @@ public class DialogueState : MonoBehaviour
             Destroy(rageAI.gameObject);
         if (fakeMonster != null)
         {
-            Destroy(GameObject.Find("NPC"));
+            foreach(GameObject npc in GameObject.FindGameObjectsWithTag("NPC"))
+            {
+                Destroy(npc);
+            }
             fakeMonster.transform.position = monsterTpPoint.transform.position;
             fakeMonster.StartDying();
             PlaySound(deathClip);

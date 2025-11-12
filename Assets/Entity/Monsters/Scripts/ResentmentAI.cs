@@ -35,9 +35,12 @@ public class ResentmentAI : MonoBehaviour
     private enum AIState { Idle, Chasing, Attacking, Returning, Searching }
     private Animator animator;
     private Vector2 move;
+    private CameraFollow cameraEffects;
+    private float distanceToPlayer;
 
     void Start()
     {
+        cameraEffects = Camera.main.GetComponent<CameraFollow>();
         agent = GetComponent<NavMeshAgent>();
         agent.updateRotation = false;
         agent.updateUpAxis = false;
@@ -106,7 +109,7 @@ public class ResentmentAI : MonoBehaviour
             return;
         }
         
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        distanceToPlayer = Vector3.Distance(transform.position, player.position);
         if (distanceToPlayer <= attackRange)
         {
             StartAttacking();
@@ -123,11 +126,12 @@ public class ResentmentAI : MonoBehaviour
 
         agent.SetDestination(player.position);
         lastKnownPlayerPosition = player.position;
+        cameraEffects.UpdateThreatEffect(distanceToPlayer, true);
     }
 
     void UpdateAttacking()
     {
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        distanceToPlayer = Vector3.Distance(transform.position, player.position);
         if (distanceToPlayer > attackRange)
         {
             StartChasing();
@@ -139,10 +143,13 @@ public class ResentmentAI : MonoBehaviour
             PerformAttack();
             attackTimer = attackCooldown;
         }
+        cameraEffects.UpdateThreatEffect(distanceToPlayer, true);
     }
     
     void UpdateSearching()
     {
+        distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
         if (CanSeePlayer())
         {
             StartChasing();
@@ -150,8 +157,9 @@ public class ResentmentAI : MonoBehaviour
         }
 
         if (stateTimer > 0) return;
-        
+
         StartReturning();
+        cameraEffects.UpdateThreatEffect(distanceToPlayer, true);
     }
     
     void UpdateReturning()
@@ -166,7 +174,7 @@ public class ResentmentAI : MonoBehaviour
         
         if (CanSeePlayer())
         {
-            float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+            distanceToPlayer = Vector3.Distance(transform.position, player.position);
             if (distanceToPlayer <= returnToPuddleDistance * 0.7f)
             {
                 StartChasing();
@@ -177,7 +185,7 @@ public class ResentmentAI : MonoBehaviour
     
     bool CanSeePlayer()
     {
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        distanceToPlayer = Vector3.Distance(transform.position, player.position);
         if (distanceToPlayer > detectionRange || hideController.isHiding) return false;
         
         RaycastHit2D hit = Physics2D.Raycast(
@@ -217,6 +225,7 @@ public class ResentmentAI : MonoBehaviour
         currentState = AIState.Returning;
         agent.isStopped = false;
         agent.SetDestination(puddlePosition);
+        cameraEffects.UpdateThreatEffect(distanceToPlayer, false);
     }
     
     void PerformAttack()

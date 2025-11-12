@@ -14,10 +14,12 @@ public class Teleport1 : MonoBehaviour
     private Color originalColor;
     private AudioSource audioSource;
     private bool teleporting = false;
+    private BoxCollider2D[] colliders;
 
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
+        colliders = GetComponents<BoxCollider2D>();
 
         if (sprite != null)
         {
@@ -48,9 +50,33 @@ public class Teleport1 : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D collision)
     {
+        foreach (BoxCollider2D col in colliders)
+        {
+            Vector2 center = col.bounds.center;
+            Vector2 size = col.bounds.size;
+
+            Collider2D[] hits = Physics2D.OverlapBoxAll(center, size, 0f);
+
+            foreach (Collider2D hit in hits)
+            {
+                if (hit != col && hit.CompareTag("Player")) // Исключаем сам коллайдер
+                {
+                    Debug.Log("Не путаемся, игрок на месте");
+                    return;
+                }
+            }
+        }
+
         if (collision.CompareTag("Player"))
         {
             sprite.color = originalColor;
+            if (teleporting)
+            {
+                Debug.Log("А игрок-то вышел...");
+                StopCoroutine("Teleport");
+                Fade.Instance.FadeFromBlack();
+                teleporting = false;
+            }
         }
     }
 
@@ -59,9 +85,28 @@ public class Teleport1 : MonoBehaviour
         if (teleportClip != null)
             audioSource.PlayOneShot(teleportClip, volume);
         Fade.Instance.FadeInOut(1f);
+        Debug.Log("Ждём секу...");
         yield return new WaitForSeconds(1f);
-        DialogueState.Instance.Teleport(teleportTo);
-        Player.transform.position = TeleportPoint.transform.position;
+
+        foreach (BoxCollider2D col in colliders)
+        {
+            Vector2 center = col.bounds.center;
+            Vector2 size = col.bounds.size;
+
+            Collider2D[] hits = Physics2D.OverlapBoxAll(center, size, 0f);
+
+            foreach (Collider2D hit in hits)
+            {
+                if (hit != col && hit.CompareTag("Player")) // Исключаем сам коллайдер
+                {
+                    Debug.Log("Игрок есть, тепаем");
+                    teleporting = false;
+                    DialogueState.Instance.Teleport(teleportTo);
+                    Player.transform.position = TeleportPoint.transform.position;
+                }
+            }
+        }
+
         teleporting = false;
         yield return null;
     }
