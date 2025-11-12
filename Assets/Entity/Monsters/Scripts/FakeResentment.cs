@@ -5,6 +5,7 @@ using Unity.Mathematics;
 public class FakeResentment : MonoBehaviour
 {
     public GameObject deathParticlesPrefab;
+    public GameObject circleParticlePrefab;
     public GameObject itemSpawnPerticlesPrefab;
     public GameObject itemDropPrefab;
     public GameObject monologPrefab;
@@ -30,6 +31,7 @@ public class FakeResentment : MonoBehaviour
         // Спавним партиклы смерти
         if (deathParticlesPrefab != null)
         {
+            Instantiate(circleParticlePrefab, transform.position, Quaternion.identity);
             GameObject newObject = Instantiate(deathParticlesPrefab, transform.position, Quaternion.identity, transform);
             //newObject.transform.SetParent(transform);
         }

@@ -54,7 +54,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: "\u041A\u043D\u043E\u043F\u043A\u0430"
-  icon: {fileID: 21300000, guid: 26e0aa33b2758c347bb75546844a0c5d, type: 3}
+  icon: {fileID: 21300000, guid: e043965145a043846a54261a1c609f93, type: 3}
 --- !u!58 &1641871568395984399
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -135,7 +135,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 4d8a0aae2a5973f4e95d265a86c4ab66, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 75d5fa8b24871454ba287622757b9cde, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
