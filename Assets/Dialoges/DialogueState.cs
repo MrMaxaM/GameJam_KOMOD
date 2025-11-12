@@ -26,6 +26,7 @@ public class DialogueState : MonoBehaviour
     // Событие при изменении состояния
     public System.Action<string> OnStateChanged;
     public System.Action OnMonologUpdate;
+    public System.Action<string> OnTeleport;
     
     void Start()
     {
@@ -102,7 +103,9 @@ public class DialogueState : MonoBehaviour
             if (fearAI != null)
                 fearAI.UpdateLocation(teleportTo);
             if (rageAI != null)
-                rageAI.UpdateLocation(teleportTo);
+            rageAI.UpdateLocation(teleportTo);
+                
+            OnTeleport?.Invoke(currentPlace);
     }
 
     public void StartWin()

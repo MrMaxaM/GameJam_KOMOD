@@ -56,7 +56,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 9eb2523ec922d4b45b23957b221e29d2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -76,7 +76,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 08772fd38dd2d21459c73d26cb99998c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -100,7 +100,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2968867b7384df43a91bba32ef8a607, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deathParticlesPrefab: {fileID: 995802282486592951, guid: d08cbeeab013bba42bb1105f5803a15b, type: 3}
+  deathParticlesPrefab: {fileID: 2182809624648979585, guid: f842fa1c8e1244e47bf3065e06b548ea, type: 3}
   itemSpawnPerticlesPrefab: {fileID: 2182809624648979585, guid: c82e6c757caeaeb4ca58284ae2ee9b97, type: 3}
   itemDropPrefab: {fileID: 2024121175974331009, guid: 6d425c196a64874479a876c9bb534ef1, type: 3}
-  monologPrefab: {fileID: 0}
+  monologPrefab: {fileID: 535005659479813237, guid: 36d643108562ae14ca4f371cc31426cb, type: 3}

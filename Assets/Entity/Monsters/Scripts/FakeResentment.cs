@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using Unity.Mathematics;
 
 public class FakeResentment : MonoBehaviour
 {
@@ -7,13 +8,13 @@ public class FakeResentment : MonoBehaviour
     public GameObject itemSpawnPerticlesPrefab;
     public GameObject itemDropPrefab;
     public GameObject monologPrefab;
-    private SpriteRenderer spriteRenderer;
+    private Material materialRenderer;
     private Rigidbody2D rb;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        materialRenderer = GetComponent<Renderer>().material;
     }
     public void StartDying()
     {
@@ -29,12 +30,12 @@ public class FakeResentment : MonoBehaviour
         // Спавним партиклы смерти
         if (deathParticlesPrefab != null)
         {
-            GameObject particles = Instantiate(deathParticlesPrefab, transform.position, Quaternion.Euler(-90, 0, 0));
+            GameObject newObject = Instantiate(deathParticlesPrefab, transform.position, Quaternion.identity, transform);
+            //newObject.transform.SetParent(transform);
         }
 
         float currentSpeed = 0.1f;
         float fadeTimer = 0f;
-        Color originalColor = spriteRenderer.color;
         Vector3 originalPosition = transform.position;
         originalPosition.z = 0f;
 
@@ -47,8 +48,8 @@ public class FakeResentment : MonoBehaviour
 
             // Плавное исчезновение
             fadeTimer += Time.deltaTime;
-            float alpha = Mathf.Lerp(1f, 0f, fadeTimer / 4f);
-            spriteRenderer.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
+            float alpha = 1.3f - Mathf.Lerp(0, 1.3f, fadeTimer / 4f);
+            materialRenderer.SetFloat("_DissolveAmount", alpha);
 
             yield return null;
         }
