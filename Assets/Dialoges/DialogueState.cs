@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
-using UnityEngine;
 using Unity.VisualScripting;
 
 public class DialogueState : MonoBehaviour
@@ -67,14 +66,9 @@ public class DialogueState : MonoBehaviour
         if (newState == "end")
         {
 
-            ElevButtonAnim ElevCanvas = FindFirstObjectByType<ElevButtonAnim>();
-            ElevCanvas.gameObject.SetActive(true);
-            ElevCanvas.PlayForward();
-            foreach (ElevAnim elevAnim in elevAnims)
-            {
-                
-                Invoke(nameof(LoadSceneByName), 5f);
-            }
+            CutsceneSequence1 ElevCanvas = FindFirstObjectByType<CutsceneSequence1>();
+            ElevCanvas.StartSequence();
+
         }
     }
 
@@ -83,14 +77,19 @@ public class DialogueState : MonoBehaviour
         return currentState == requiredState;
     }
 
+    public void LoadScene()
+    {
+        StartCoroutine("LoadSceneByName");
+    }
+
     public IEnumerator LoadSceneByName()
     {
         foreach (ElevAnim elevAnim in elevAnims)
         {
             elevAnim.PlayBackward();
-            PlaySound(elevOpenClip);
-            Fade.Instance.FadeToBlack(1f);
         }
+        PlaySound(elevOpenClip);
+        Fade.Instance.FadeToBlack(1f);
         yield return new WaitForSeconds(1f);
         if (sceneToLoad != null)
         {

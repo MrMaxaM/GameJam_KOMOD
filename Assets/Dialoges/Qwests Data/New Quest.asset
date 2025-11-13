@@ -15,7 +15,7 @@ MonoBehaviour:
   questName: ElevatorQuest
   requiredState: win
   requiredItems:
-  - {fileID: 6739916415474034942, guid: 6d425c196a64874479a876c9bb534ef1, type: 3}
+  - {fileID: 8203096987895216658, guid: c7f349274dd88fd4cba70ee5502d14d2, type: 3}
   completionState: end
   completionDialogue: {fileID: 0}
   failureDialogue: {fileID: 11400000, guid: 4468277189c7dfd44ac33f8bebdec0fc, type: 2}

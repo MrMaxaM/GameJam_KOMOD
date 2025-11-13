@@ -6,6 +6,7 @@ public class FakeResentment : MonoBehaviour
 {
     public GameObject deathParticlesPrefab;
     public GameObject circleParticlePrefab;
+    public GameObject circlePrefab;
     public GameObject itemSpawnPerticlesPrefab;
     public GameObject itemDropPrefab;
     public GameObject monologPrefab;
@@ -31,7 +32,8 @@ public class FakeResentment : MonoBehaviour
         // Спавним партиклы смерти
         if (deathParticlesPrefab != null)
         {
-            Instantiate(circleParticlePrefab, transform.position, Quaternion.identity);
+            Instantiate(circleParticlePrefab, transform.position, Quaternion.Euler(-90, 0, 0));
+            Instantiate(circlePrefab, transform.position, Quaternion.identity);
             GameObject newObject = Instantiate(deathParticlesPrefab, transform.position, Quaternion.identity, transform);
             //newObject.transform.SetParent(transform);
         }
@@ -59,7 +61,7 @@ public class FakeResentment : MonoBehaviour
         // Спавним предмет на оригинальной позиции монстра
         if (itemDropPrefab != null)
         {
-            Instantiate(itemDropPrefab, originalPosition, Quaternion.identity);
+            Instantiate(itemDropPrefab, originalPosition + Vector3.up * 0.5f, Quaternion.identity);
             Instantiate(itemSpawnPerticlesPrefab, originalPosition, Quaternion.Euler(-90, 0, 0));
             if (monologPrefab != null)
                 Instantiate(monologPrefab, originalPosition, Quaternion.identity);
