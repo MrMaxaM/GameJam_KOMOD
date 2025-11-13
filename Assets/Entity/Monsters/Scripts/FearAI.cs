@@ -22,6 +22,8 @@ public class FearAI : MonoBehaviour
     [Header("Visual Settings")]
     public float darkenIntensity = 0.5f;
     public float transparency = 0.7f;
+    public float fadeOutDuration = 1f;
+    public float fadeInDuration = 0.15f;
 
     [Header("Attack Settings")]
     public float attackCooldown = 1.5f;
@@ -42,6 +44,7 @@ public class FearAI : MonoBehaviour
     private Transform player;
     private HideController hideController;
     private SpriteRenderer spriteRenderer;
+    private bool isVisible;
     private Color originalColor;
     private Collider2D monsterCollider;
     private Rigidbody2D rb;
@@ -52,6 +55,7 @@ public class FearAI : MonoBehaviour
 
     private AdaptiveMusicManager musicManager;
     private CameraFollow cameraEffects;
+    private Coroutine fadeCoroutine;
     private float distanceToPlayer;
 
     void Start()
@@ -74,11 +78,6 @@ public class FearAI : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
-
-        if (spriteRenderer != null)
-            originalColor = spriteRenderer.color;
-
-        // Debug.Log("Тест1");
         
         if (spriteRenderer != null)
         {
@@ -115,7 +114,21 @@ public class FearAI : MonoBehaviour
                 UpdateDashing();
                 break;
         }
-        
+
+        bool canSee = CanSeePlayer();
+
+        if (!canSee && isVisible)
+        {
+            if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
+            fadeCoroutine = StartCoroutine(FadeOutRoutine());
+        }
+
+        if (canSee && !isVisible)
+        {
+            if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
+            fadeCoroutine = StartCoroutine(FadeInRoutine());
+        }
+
         // Обновляем последнее направление если есть движение
         if (move.magnitude > 0.1f)
         {
@@ -281,7 +294,7 @@ public class FearAI : MonoBehaviour
             currentState = AIState.Wandering;
             agent.speed = wanderSpeed;
             agent.isStopped = false;
-            ResetAppearance();
+            // ResetAppearance();
         }
     }
 
@@ -290,7 +303,7 @@ public class FearAI : MonoBehaviour
         currentState = AIState.Waiting;
         agent.isStopped = true;
         stateTimer = hidingTime;
-        DarkenAppearance();
+        // DarkenAppearance();
         if (musicManager != null)
             musicManager.SetState(AdaptiveMusicManager.MonsterState.Calm);
     }
@@ -300,7 +313,7 @@ public class FearAI : MonoBehaviour
         currentState = AIState.Wandering;
         agent.speed = wanderSpeed;
         agent.isStopped = false;
-        ResetAppearance();
+        // ResetAppearance();
         SetWanderDestination();
         if (musicManager != null)
             musicManager.SetState(AdaptiveMusicManager.MonsterState.Calm);
@@ -314,7 +327,7 @@ public class FearAI : MonoBehaviour
         agent.stoppingDistance = attackRange * 0.8f;
         agent.speed = chaseSpeed;
         agent.isStopped = false;
-        ResetAppearance();
+        // ResetAppearance();
 
         if (musicManager != null)
             musicManager.SetState(AdaptiveMusicManager.MonsterState.Chase);
@@ -324,7 +337,7 @@ public class FearAI : MonoBehaviour
     {
         currentState = AIState.Attacking;
         agent.isStopped = true;
-        ResetAppearance();
+        // ResetAppearance();
         if (musicManager != null)
             musicManager.SetState(AdaptiveMusicManager.MonsterState.Chase);
     }
@@ -335,7 +348,7 @@ public class FearAI : MonoBehaviour
         agent.SetDestination(lastKnownPlayerPosition);
         stateTimer = sightWaitTime;
         agent.isStopped = false;
-        ResetAppearance();
+        // ResetAppearance();
         if (musicManager != null)
             musicManager.SetState(AdaptiveMusicManager.MonsterState.Search);
     }
@@ -359,7 +372,7 @@ public class FearAI : MonoBehaviour
         PlaySound(attackClip);
 
         dashTimer = dashDuration;
-        ResetAppearance();
+        // ResetAppearance();
         if (musicManager != null)
             musicManager.SetState(AdaptiveMusicManager.MonsterState.Chase);
     }
@@ -389,23 +402,64 @@ public class FearAI : MonoBehaviour
         }
     }
 
-    void DarkenAppearance()
+    System.Collections.IEnumerator FadeOutRoutine()
     {
-        if (spriteRenderer != null)
+        isVisible = false;
+        float timer = 0f;
+        Color initialColor = spriteRenderer.color;
+
+        while (timer < fadeOutDuration)
         {
-            Color darkenedColor = originalColor * darkenIntensity;
-            darkenedColor.a = transparency;
-            spriteRenderer.color = darkenedColor;
+            timer += Time.deltaTime;
+            float progress = timer / fadeOutDuration;
+            Color newColor = initialColor;
+            newColor.a = Mathf.Lerp(initialColor.a, 0f, progress);
+            spriteRenderer.color = newColor;
+            yield return null;
         }
+
+        // Полностью скрываем
+        Color final = spriteRenderer.color;
+        final.a = 0f;
+        spriteRenderer.color = final;
+        fadeCoroutine = null;
     }
 
-    void ResetAppearance()
+    IEnumerator FadeInRoutine()
     {
-        if (spriteRenderer != null)
+        isVisible = true;
+        float timer = 0f;
+        Color startColor = spriteRenderer.color;
+        Color endColor = originalColor;
+
+        while (timer < fadeInDuration)
         {
-            spriteRenderer.color = originalColor;
+            timer += Time.deltaTime;
+            float t = Mathf.Clamp01(timer / fadeInDuration);
+            spriteRenderer.color = Color.Lerp(startColor, endColor, t);
+            yield return null;
         }
+
+        spriteRenderer.color = endColor; // гарантируем, что стал полностью видимым
     }
+
+    //void DarkenAppearance()
+    //{
+    //    if (spriteRenderer != null)
+    //    {
+    //        Color darkenedColor = originalColor * darkenIntensity;
+    //        darkenedColor.a = transparency;
+    //        spriteRenderer.color = darkenedColor;
+    //    }
+    //}
+
+    //void ResetAppearance()
+    //{
+    //    if (spriteRenderer != null)
+    //    {
+    //        spriteRenderer.color = originalColor;
+    //    }
+    //}
 
     void OnDrawGizmosSelected()
     {
