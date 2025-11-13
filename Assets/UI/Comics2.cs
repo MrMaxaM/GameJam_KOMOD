@@ -24,6 +24,7 @@ public class CutsceneSequence1 : MonoBehaviour
     public bool skipOnClick = true; // Пропуск по клику
     public bool autoStart = true; // Автозапуск
     public string nextSceneName;
+    public AudioSource audioSource;
 
     [Header("References")]
     public CanvasGroup canvasGroup; // Основной Canvas Group
@@ -37,11 +38,17 @@ public class CutsceneSequence1 : MonoBehaviour
     {
         // Скрываем все объекты в начале
         HideAllObjects();
+        audioSource = GetComponent<AudioSource>();
 
         if (autoStart)
         {
             StartSequence();
         }
+    }
+
+    void PlaySound()
+    {
+        audioSource.Play();
     }
 
     // Запустить последовательность
@@ -52,6 +59,7 @@ public class CutsceneSequence1 : MonoBehaviour
         isPlaying = true;
         currentBlockIndex = 0;
         sequenceCoroutine = StartCoroutine(SequenceRoutine());
+        Invoke("PlaySound", delayBetweenBlocks + 1f);
     }
 
     // Остановить последовательность

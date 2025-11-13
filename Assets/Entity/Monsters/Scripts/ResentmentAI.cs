@@ -108,8 +108,10 @@ public class ResentmentAI : MonoBehaviour
             StartSearching();
             return;
         }
-        
+
         distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        cameraEffects.UpdateThreatEffect(distanceToPlayer, true);
+
         if (distanceToPlayer <= attackRange)
         {
             StartAttacking();
@@ -126,7 +128,6 @@ public class ResentmentAI : MonoBehaviour
 
         agent.SetDestination(player.position);
         lastKnownPlayerPosition = player.position;
-        cameraEffects.UpdateThreatEffect(distanceToPlayer, true);
     }
 
     void UpdateAttacking()
@@ -165,6 +166,7 @@ public class ResentmentAI : MonoBehaviour
     void UpdateReturning()
     {
         float distanceToPuddle = Vector3.Distance(transform.position, puddlePosition);
+        cameraEffects.UpdateThreatEffect(distanceToPlayer, false);
         
         if (distanceToPuddle <= 1.5f)
         {

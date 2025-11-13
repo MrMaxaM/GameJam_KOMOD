@@ -1058,7 +1058,7 @@ GameObject:
   - component: {fileID: 1691787776}
   - component: {fileID: 1691787780}
   - component: {fileID: 1691787782}
-  - component: {fileID: 1691787781}
+  - component: {fileID: 1691787783}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1164,23 +1164,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &1691787781
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1691787775}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 470864099f41ed341bff56ef5525ac55, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  backgroundMusic: {fileID: 8300000, guid: e8b53b7007ead4644a0446044171d8e2, type: 3}
-  fadeInTime: 2
-  fadeOutTime: 2
-  playOnStart: 1
-  loop: 1
 --- !u!114 &1691787782
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1195,6 +1178,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playButton: {fileID: 38396080}
   exitButton: {fileID: 1120210956}
+--- !u!114 &1691787783
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1691787775}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f47adcad8475d95408569a4b6feda025, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  backgroundMusic: {fileID: 8300000, guid: e8b53b7007ead4644a0446044171d8e2, type: 3}
+  fadeInTime: 2
+  fadeOutTime: 2
+  playOnStart: 1
+  loop: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
