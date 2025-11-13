@@ -27,7 +27,17 @@ public class RageAI : MonoBehaviour
     
     [Header("Destruction")]
     public GameObject destructionEffect;
-    
+
+    [Header("Audio Settings")]
+    public AudioClip attackClip;           // звук атаки
+    public AudioClip[] chaseClips;         // набор звуков для преследования
+
+    [Header("Footstep Settings")]
+    public AudioClip[] stepClips;          // набор звуков шагов
+    public float baseStepInterval = 0.7f;  // базовый интервал между шагами
+    private Coroutine stepRoutine;         // корутина для шагов
+
+    private AudioSource audioSource;
     private NavMeshAgent agent;
     private Transform player;
     
@@ -36,11 +46,6 @@ public class RageAI : MonoBehaviour
     private Vector3 lastHeardPosition;
     private float stateTimer;
     private float attackTimer;
-
-    [Header("Audio Settings")]
-    public AudioClip attackClip;           // звук атаки
-    public AudioClip[] chaseClips;         // набор звуков для преследования
-    private AudioSource audioSource;
 
     private enum AIState { Wandering, Chasing, PreparingCharge, Charging, Searching, Dying }
     private AIState currentState = AIState.Wandering;
@@ -80,6 +85,7 @@ public class RageAI : MonoBehaviour
             audioSource = gameObject.AddComponent<AudioSource>();
 
         SetWanderDestination();
+        StartStepSounds();
     }
 
     void Update()
@@ -142,6 +148,41 @@ public class RageAI : MonoBehaviour
         if (playerController != null)
         {
             currentHearingRange = playerController.isCrouching ? crouchHearingRange : normalHearingRange;
+        }
+    }
+
+    void StartStepSounds()
+    {
+        if (stepRoutine != null)
+            StopCoroutine(stepRoutine);
+
+        stepRoutine = StartCoroutine(PlayFootsteps());
+    }
+
+    void StopStepSounds()
+    {
+        if (stepRoutine != null)
+        {
+            StopCoroutine(stepRoutine);
+            stepRoutine = null;
+        }
+    }
+
+    IEnumerator PlayFootsteps()
+    {
+        while (true)
+        {
+            // проигрывать шаги только когда монстр реально движется
+            if ((currentState == AIState.Wandering || currentState == AIState.Chasing || currentState == AIState.Searching)
+                && move.magnitude > 0.1f && stepClips.Length > 0)
+            {
+                var clip = stepClips[Random.Range(0, stepClips.Length)];
+                audioSource.PlayOneShot(clip);
+            }
+
+            // интервал зависит от скорости
+            float speedFactor = Mathf.Clamp(agent.speed / chaseSpeed, 0.5f, 1.5f);
+            yield return new WaitForSeconds(baseStepInterval / speedFactor);
         }
     }
 
